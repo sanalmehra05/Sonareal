@@ -1,0 +1,118 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Cyber Portfolio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="#" class="logo">CYBERSPACE</a>
+    <ul class="menu">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="hamburger">☰</button>
+  </nav>
+
+  <section class="hero">
+    <div id="interactive-area" class="interactive-area">
+      <div class="anime-character"></div>
+      <div class="ball bouncing-ball"></div>
+      <div class="ball user-ball"></div>
+
+      <div class="hero-content">
+        <h1>ALIENOR</h1>
+        <p>Creative developer specializing in interactive experiences and digital art</p>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn">View Projects</a>
+          <a href="#contact" class="btn btn-secondary">Contact Me</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <h2 class="section-title">About Me</h2>
+    <div class="about-content">
+      <p>I'm a creative developer with a passion for blending technology and art to create immersive digital experiences. My work sits at the intersection of web development, interactive design, and digital art.</p>
+      <p>With a background in both programming and visual arts, I specialize in creating websites and applications that are not only functional but also visually stunning and emotionally engaging.</p>
+      <p>My approach combines technical expertise with artistic vision to push the boundaries of what's possible in the digital space.</p>
+    </div>
+  </section>
+
+  <section id="skills" class="skills">
+    <h2 class="section-title">Skills</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>Creative Coding</h3>
+        <p>Generative art, interactive installations, and experimental web experiences using p5.js, Three.js, and WebGL.</p>
+      </div>
+      <div class="skill-card">
+        <h3>Frontend</h3>
+        <p>Modern JavaScript, React, Vue, responsive design, and cutting-edge CSS animations and effects.</p>
+      </div>
+      <div class="skill-card">
+        <h3>UI/UX Design</h3>
+        <p>User-centered design, interaction design, prototyping, and creating intuitive user experiences.</p>
+      </div>
+      <div class="skill-card">
+        <h3>Motion Design</h3>
+        <p>Advanced CSS animations, SVG animations, WebGL transitions, and interactive storytelling.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="projects">
+    <h2 class="section-title">Projects</h2>
+    <div class="projects-grid">
+      <div class="project-card">
+        <h3>Nebula Generator</h3>
+        <p>Interactive generative art installation that creates unique cosmic nebulas using particle systems and physics simulations.</p>
+        <a href="#" class="btn small">View Project</a>
+      </div>
+      <div class="project-card">
+        <h3>Digital Dreamscape</h3>
+        <p>VR experience that visualizes dream patterns using EEG data and creates immersive dream environments in real-time.</p>
+        <a href="#" class="btn small">View Project</a>
+      </div>
+      <div class="project-card">
+        <h3>Quantum Interface</h3>
+        <p>Experimental UI framework that uses quantum computing principles to create adaptive, context-aware interfaces.</p>
+        <a href="#" class="btn small">View Project</a>
+      </div>
+      <div class="project-card">
+        <h3>Synthwave Dashboard</h3>
+        <p>Retro-futuristic analytics dashboard with neon aesthetics and real-time data visualization.</p>
+        <a href="#" class="btn small">View Project</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <h2 class="section-title">Contact Me</h2>
+    <form action="#" class="contact-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" rows="5" required></textarea>
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>© 2023 Alienor. All rights reserved.</p>
+    <div class="social-links">
+      <a href="#">𝕏</a>
+      <a href="#">𝔻</a>
+      <a href="#">𝕀</a>
+      <a href="#">𝔾</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
