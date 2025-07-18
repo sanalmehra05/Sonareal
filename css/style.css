@@ -1,5 +1,5 @@
 /* styles.css */
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap');
+@import url(https://db.onlinewebfonts.com/c/2d57f676e3d6955778fb8acac0176b9a?family=Eina01-Bold);
 
 /*─────────────────────
  Modern Cyber Theme
@@ -22,15 +22,15 @@
   box-sizing: border-box;
 }
 
-
 body {
   background: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Eina01-Bold', sans-serif;
   overflow-x: hidden;
   position: relative;
 }
+
 
 body::before {
   content: '';
@@ -70,7 +70,7 @@ body::before {
   font-weight: 700;
   font-size: 1.5rem;
   text-decoration: none;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Eina01-Bold', sans-serif;
   letter-spacing: 1px;
   text-shadow: var(--glow-primary);
   transition: var(--transition);
@@ -153,53 +153,11 @@ body::before {
   justify-content: center;
 }
 
-.anime-character {
+.anime-character-wrapper {
   position: absolute;
-  bottom: 5%;
-  right: 5%;
-  width: 200px;
-  height: 300px;
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
-  border-radius: 50% 50% 0 0;
-  clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 25% 100%, 0 75%);
-  box-shadow:
-    0 0 30px var(--secondary-color),
-    0 0 60px rgba(255, 0, 255, 0.4);
-  filter: blur(1px);
-  opacity: 0.7;
+  bottom: 0px;
+  right: 0px;
   z-index: 1;
-  transition: var(--transition);
-}
-
-.anime-character:hover {
-  opacity: 1;
-  filter: blur(0);
-  transform: translateY(-10px) scale(1.05);
-  box-shadow:
-    0 0 40px var(--secondary-color),
-    0 0 80px rgba(255, 0, 255, 0.6);
-}
-
-.anime-character::before {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 30%;
-  width: 40%;
-  height: 15%;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 50%;
-}
-
-.anime-character::after {
-  content: '';
-  position: absolute;
-  bottom: 15%;
-  left: 25%;
-  width: 50%;
-  height: 5px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 50%;
 }
 
 .ball {
@@ -236,27 +194,18 @@ body::before {
   z-index: 5;
   max-width: 800px;
   padding: 2rem;
-  background: rgba(10, 10, 26, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  transform: translateY(0);
-  transition: var(--transition);
 }
 
-.hero-content:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
-}
-
-.hero-content h1 {
-  font-size: 4.5rem;
-  margin-bottom: 1rem;
+.heading{
+  font-size: 2.5rem;
   text-shadow: var(--glow-primary);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Eina01-Bold', sans-serif;
   letter-spacing: 3px;
   animation: glitch 2s infinite alternate;
+}
+
+.transcend{
+  text-shadow: var(--glow-secondary) !important;
 }
 
 @keyframes glitch {
@@ -269,11 +218,9 @@ body::before {
 }
 
 .hero-content p {
-  font-size: 1.5rem;
-  margin-bottom: 2.5rem;
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
   max-width: 600px;
-  margin: 0 auto;
+  margin-bottom: 4%;
 }
 
 .hero-buttons {
@@ -285,15 +232,12 @@ body::before {
 
 .btn {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 1rem 2.5rem;
   background: transparent;
   color: var(--text-color);
   text-decoration: none;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 1.1rem;
   letter-spacing: 1px;
   position: relative;
   overflow: hidden;

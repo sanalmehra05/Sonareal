@@ -100,8 +100,9 @@ tsParticles.load('particles', {
 
     move: {
       enable: true,
-      speed: 1,
-      outModes: 'out'
+      speed: 0.5, // Slower base speed for better scroll effect
+      outModes: 'split',
+      direction: 'none' // Start with no direction
     }
   },
 
@@ -111,9 +112,48 @@ tsParticles.load('particles', {
       resize: true
     },
     modes: {
-      repulse: { distance: 100, duration: 0.4 }
+      repulse: { distance: 40, duration: 0.4 }
     }
   },
 
   detectRetina: true
 });
+
+let lastScrollY = window.scrollY || window.pageYOffset;
+let scrollVelocity = 0;
+let scrollTimer = null;
+
+window.addEventListener('scroll', () => {
+  const currentScrollY = window.scrollY || window.pageYOffset;
+
+  // Determine scroll direction
+  scrollDirection = currentScrollY > lastScrollY ? 1 : 
+                   (currentScrollY < lastScrollY ? -1 : 0);
+
+  lastScrollY = currentScrollY;
+
+  // Get particles instance
+  const particles = tsParticles.domItem(0);
+  if (!particles || !particles.options?.particles?.move) return;
+
+  // Update particle movement based on scroll
+  if (scrollDirection === 1) {
+    // Scrolling down - particles move up faster
+    particles.options.particles.move.direction = 'top';
+    particles.options.particles.move.speed = 3;
+  } else if (scrollDirection === -1) {
+    // Scrolling up - particles move down slower
+    particles.options.particles.move.direction = 'bottom';
+    particles.options.particles.move.speed = 3;
+  } else {
+    // No scrolling - random movement
+    particles.options.particles.move.direction = 'none';
+    particles.options.particles.move.speed = 0.5;
+  }
+
+  // Force particle update
+  particles.refresh();
+});
+
+// Initialize particles with neutral movement
+window.dispatchEvent(new Event('scroll'));
