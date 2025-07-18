@@ -54,3 +54,66 @@ area.addEventListener('mousemove', e => {
   const y = e.clientY - A.top  - ubR;
   ub.style.transform = `translate(${x}px, ${y}px)`;
 });
+
+tsParticles.load('particles', {
+  particles: {
+    number: { value: 30, density: { enable: true, area: 800 } },
+    color: { value: '#ececec' },
+    shape: { type: 'circle' },
+
+    // Add a soft glow via shadow
+    shadow: {
+      enable: true,
+      blur: 8,
+      color: { value: '#ececec' }
+    },
+
+    // Tiny size variation + animating size for more life
+    size: {
+      value: { min: 1, max: 3 },
+      animation: {
+        enable: true,
+        speed: 1.5,
+        minimumValue: 1,
+        sync: false
+      }
+    },
+
+    // Twinkle effect: random brighten/darken flashes
+    twinkle: {
+      particles: {
+        enable: true,
+        frequency: 0.05,
+        opacity: 0.6
+      }
+    },
+
+    opacity: {
+      value: 0.3,
+      animation: {
+        enable: true,
+        speed: 0.5,
+        minimumValue: 0.1,
+        sync: false
+      }
+    },
+
+    move: {
+      enable: true,
+      speed: 1,
+      outModes: 'out'
+    }
+  },
+
+  interactivity: {
+    events: {
+      onHover: { enable: true, mode: 'repulse' },
+      resize: true
+    },
+    modes: {
+      repulse: { distance: 100, duration: 0.4 }
+    }
+  },
+
+  detectRetina: true
+});
