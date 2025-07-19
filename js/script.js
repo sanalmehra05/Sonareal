@@ -101,7 +101,7 @@ tsParticles.load('particles', {
     move: {
       enable: true,
       speed: 0.5, // Slower base speed for better scroll effect
-      outModes: 'split',
+      outModes: 'bounce',
       direction: 'none' // Start with no direction
     }
   },
