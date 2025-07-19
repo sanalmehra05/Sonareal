@@ -1,18 +1,26 @@
 /* styles.css */
+/*───────────────────────────────────────────────────────────
+  GLOBAL STYLES & VARIABLES
+───────────────────────────────────────────────────────────*/
 @import url(https://db.onlinewebfonts.com/c/2d57f676e3d6955778fb8acac0176b9a?family=Eina01-Bold);
+@import url(https://db.onlinewebfonts.com/c/1868e326d3ee28e5395f6efa2bc037bf?family=Eina01-Regular);
+@import url(https://fonts.cdnfonts.com/css/coolvetica-2); 
 
-/*─────────────────────
- Modern Cyber Theme
-─────────────────────*/
+/* Modern Cyber Theme Variables */
 :root {
-  --bg-color: #0a0a1a;
-  --primary-color: #00ffff;
-  --secondary-color: #ff00ff;
+  --bg-color: #1d2935;
+  --primary-color: #6faef3;
+  --secondary-color: #BD8BE3;
   --accent-color: #ffff00;
+  --nav-height: 100px;
   --text-color: #ececec;
   --card-bg: rgba(20, 10, 40, 0.7);
-  --glow-primary: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px var(--primary-color);
-  --glow-secondary: 0 0 10px var(--secondary-color), 0 0 20px var(--secondary-color), 0 0 30px var(--secondary-color);
+  --glow-primary: 0 0 10px var(--primary-color), 
+                  0 0 20px var(--primary-color), 
+                  0 0 30px var(--primary-color);
+  --glow-secondary: 0 0 10px var(--secondary-color), 
+                    0 0 20px var(--secondary-color), 
+                    0 0 30px var(--secondary-color);
   --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -20,17 +28,23 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  cursor: none
 }
 
+/*───────────────────────────────────────────────────────────
+  BODY & BACKGROUND STYLES
+───────────────────────────────────────────────────────────*/
 body {
-  background: var(--bg-color);
+  background: linear-gradient(0deg, rgba(102, 180, 243, 0.041) 0%, rgba(0, 0, 0, 0.20) 100%),
+    radial-gradient(ellipse 50.00% 50.00% at 50.00% 50.00%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.21) 0%, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.27) 0%, rgba(0, 0, 0, 0.28) 100%, rgba(0, 0, 0, 0.28) 100%, rgba(0, 0, 0, 0.29) 100%),
+    radial-gradient(ellipse 50.00% 50.00% at 50.00% 50.00%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.06) 32%, rgba(0, 0, 0, 0.10) 50%, rgba(0, 0, 0, 0.13) 100%), rgba(27, 29, 42, 0.44); 
   color: var(--text-color);
   line-height: 1.6;
   font-family: 'Eina01-Bold', sans-serif;
   overflow-x: hidden;
   position: relative;
+  cursor: none;
 }
-
 
 body::before {
   content: '';
@@ -43,36 +57,41 @@ body::before {
     radial-gradient(circle at 10% 20%, rgba(100, 0, 255, 0.05) 0px, transparent 1px),
     radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.05) 0px, transparent 1px),
     linear-gradient(rgba(10, 10, 26, 0.9), rgba(10, 10, 26, 0.9)),
-    repeating-linear-gradient(0deg, rgba(50, 50, 100, 0.1) 0px, rgba(50, 50, 100, 0.1) 1px, transparent 1px, transparent 40px),
-    repeating-linear-gradient(90deg, rgba(50, 50, 100, 0.1) 0px, rgba(50, 50, 100, 0.1) 1px, transparent 1px, transparent 40px);
+    repeating-linear-gradient(0deg, rgba(50, 50, 100, 0.1) 0px, 
+      rgba(50, 50, 100, 0.1) 1px, transparent 1px, transparent 40px),
+    repeating-linear-gradient(90deg, rgba(50, 50, 100, 0.1) 0px, 
+      rgba(50, 50, 100, 0.1) 1px, transparent 1px, transparent 40px);
   background-size: 100% 100%;
   z-index: -2;
   pointer-events: none;
 }
 
-/* Navigation */
+/*───────────────────────────────────────────────────────────
+  NAVIGATION BAR
+───────────────────────────────────────────────────────────*/
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 3rem;
-  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(12px);
   position: fixed;
-  top: 0;
   width: 100%;
+  height: var(--nav-height);
+  padding: 0 3rem;
   z-index: 100;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Logo */
 .nav .logo {
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 1.5rem;
+  text-align: center;
+  color: white;
+  font-size: 40px;
+  font-family: 'Coolvetica', sans-serif;
   text-decoration: none;
-  font-family: 'Eina01-Bold', sans-serif;
-  letter-spacing: 1px;
-  text-shadow: var(--glow-primary);
+  font-weight: 100;
+  word-wrap: break-word;
   transition: var(--transition);
 }
 
@@ -81,6 +100,7 @@ body::before {
   transform: translateY(-2px);
 }
 
+/* Navigation Menu */
 .nav .menu {
   list-style: none;
   display: flex;
@@ -88,6 +108,7 @@ body::before {
 }
 
 .nav .menu li a {
+  font-family: 'Eina01-Regular', sans-serif;
   color: var(--text-color);
   text-decoration: none;
   font-weight: 400;
@@ -109,14 +130,29 @@ body::before {
   transition: var(--transition);
 }
 
-.nav .menu li a:hover {
-  color: var(--secondary-color);
-}
-
 .nav .menu li a:hover::after {
   width: 100%;
 }
 
+/* Navigation Buttons */
+.nav-button {
+  display: flex;
+  justify-content: center;
+  gap: 0px;
+  flex-wrap: wrap;
+  background: radial-gradient(ellipse 66.90% 355.10% at 50.00% 50.00%, #D07BF2 0%, #66B4F3 100%); border-radius: 70px
+}
+
+.btn {
+  text-align: center;
+  color: white; 
+  font-size: 21px; 
+  font-family: "Coolvetica", sans-serif;
+  font-weight: 100; 
+  background: radial-gradient(ellipse 66.90% 355.10% at 50.00% 50.00%, #D07BF2 0%, #66B4F3 100%); border-radius: 70px
+}
+
+/* Mobile Menu Toggle */
 .hamburger {
   display: none;
   background: none;
@@ -132,62 +168,138 @@ body::before {
   transform: rotate(90deg);
 }
 
-/* Hero */
+/*───────────────────────────────────────────────────────────
+  HERO SECTION
+───────────────────────────────────────────────────────────*/
 .hero {
   position: relative;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: calc(15vh + var(--nav-height));
+  height: calc(100vh - var(--nav-height));
 }
 
 .interactive-area {
   position: relative;
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .anime-character-wrapper {
   position: absolute;
-  bottom: 0px;
-  right: 0px;
+  top: 60px;
+  right: 50px;
   z-index: 1;
 }
 
+/* Eye white */
+/* .eye {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  overflow: hidden;
+} */
+
+/* Black pupil */
+/* .eye .pupil {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: black;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  transform-origin: center center;
+  transition: transform 0.1s ease-out;
+} */
+
+/* Position the two eyes – tweak these values to line up exactly */
+/* .eye-left {
+  top: 80px;    
+  right:  60px;  
+}
+.eye-right {
+  top: 80px;
+  right:  120px;
+} */
+
+/*───────────────────────────────────────────────────────────
+  INTERACTIVE ELEMENTS (BALLS)
+───────────────────────────────────────────────────────────*/
 .ball {
-  position: fixed;  /* ← FIXED, not absolute */
+  position: absolute;  
   top: 0;
   left: 0;
   width: 30px;
   height: 30px;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1000;
 }
 
+/* Bouncing Ball */
 .bouncing-ball {
   background: var(--accent-color);
   box-shadow:
     0 0 8px var(--accent-color),
     0 0 16px var(--accent-color),
     0 0 24px var(--accent-color);
+  z-index: 0;
 }
 
+/* User-controlled Ball */
 .user-ball {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.user-ball-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   background: var(--primary-color);
   mix-blend-mode: screen;
   box-shadow:
-    0 0 8px var(--primary-color),
-    0 0 16px var(--primary-color),
-    0 0 24px var(--primary-color);
+    0 0 5px var(--primary-color),
+    0 0 5px var(--primary-color),
+    0 0 5px var(--primary-color);
+  /* ensure it's on top of the outer layer */
+  position: relative;
 }
 
+@keyframes wobble {
+  0%   { transform: scale(1); }
+  20%  { transform: scale(0.8); }   /* first squash */
+  40%  { transform: scale(1.2); }   /* big pop */
+  60%  { transform: scale(0.9); }   /* undershoot */
+  80%  { transform: scale(1.1); }   /* small rebound */
+  100% { transform: scale(1.0); }     /* back to normal */
+}
+
+/* Apply the new wobble – tweak duration/easing to taste */
+.user-ball-inner.wobble {
+  animation: wobble 0.8s cubic-bezier(0.25, 1.25, 0.5, 1) both;
+}
+
+.extra-ball {
+  background: var(--accent-color);
+  box-shadow:
+    0 0 8px var(--accent-color),
+    0 0 16px var(--accent-color),
+    0 0 24px var(--accent-color);
+  /* keep them under the user ball */
+  z-index: 500;
+}
+
+/*───────────────────────────────────────────────────────────
+  HERO CONTENT
+───────────────────────────────────────────────────────────*/
 .hero-content {
   position: relative;
   text-align: center;
@@ -196,18 +308,30 @@ body::before {
   padding: 2rem;
 }
 
-.heading{
-  font-size: 2.5rem;
-  text-shadow: var(--glow-primary);
-  font-family: 'Eina01-Bold', sans-serif;
-  letter-spacing: 3px;
-  animation: glitch 2s infinite alternate;
+/* Headings */
+.heading {
+  margin-bottom: -3rem;
 }
 
-.transcend{
-  text-shadow: var(--glow-secondary) !important;
+.transcend {
+  text-shadow: 0px 0px 13px rgba(255, 255, 255, 0.25) !important;
 }
 
+.subheading {
+  width: 517px;
+  text-align: center;
+  font-size: 16px;
+  font-family: "Eina01-Regular";
+  font-weight: 400;
+  opacity: 0.55;
+  word-spacing: 0.05em;
+  letter-spacing: 0.03em;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  text-shadow: 0px 0px 7px
+}
+
+/* Glitch Animation */
 @keyframes glitch {
   0% { transform: translate(0); }
   20% { transform: translate(-3px, 3px); }
@@ -223,6 +347,7 @@ body::before {
   margin-bottom: 4%;
 }
 
+/* Hero Buttons */
 .hero-buttons {
   display: flex;
   justify-content: center;
@@ -230,6 +355,9 @@ body::before {
   flex-wrap: wrap;
 }
 
+/*───────────────────────────────────────────────────────────
+  BUTTON STYLES
+───────────────────────────────────────────────────────────*/
 .btn {
   display: inline-flex;
   padding: 1rem 2.5rem;
@@ -259,16 +387,13 @@ body::before {
   z-index: -1;
 }
 
-.btn:hover {
-  color: #000;
-  box-shadow: 0 0 20px var(--primary-color), 0 0 30px rgba(0, 255, 255, 0.5);
-  transform: translateY(-5px);
-}
+
 
 .btn:hover::before {
   width: 200%;
 }
 
+/* Secondary Button Variant */
 .btn-secondary {
   border-color: var(--secondary-color);
   box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
@@ -282,7 +407,9 @@ body::before {
   background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
 }
 
-/* Section titles */
+/*───────────────────────────────────────────────────────────
+  SECTION STYLES (COMMON)
+───────────────────────────────────────────────────────────*/
 .section-title {
   text-align: center;
   margin-bottom: 3rem;
@@ -308,11 +435,9 @@ section {
   padding: 6rem 2rem;
 }
 
-.about {
-  background: linear-gradient(to bottom, rgba(10, 10, 26, 0.8), rgba(20, 10, 40, 0.8));
-  
-}
-
+/*───────────────────────────────────────────────────────────
+  ABOUT SECTION
+───────────────────────────────────────────────────────────*/
 .about-content {
   max-width: 800px;
   margin: 0 auto;
@@ -325,10 +450,9 @@ section {
   margin-bottom: 1.5rem;
 }
 
-.skills {
-  background: linear-gradient(to bottom, rgba(20, 10, 40, 0.8), rgba(10, 10, 26, 0.8));
-}
-
+/*───────────────────────────────────────────────────────────
+  SKILLS SECTION
+───────────────────────────────────────────────────────────*/
 .skills-grid {
   display: grid;
   gap: 2.5rem;
@@ -383,10 +507,9 @@ section {
   font-size: 1.1rem;
 }
 
-.projects {
-  background: linear-gradient(to bottom, rgba(10, 10, 26, 0.8), rgba(20, 10, 40, 0.8));
-}
-
+/*───────────────────────────────────────────────────────────
+  PROJECTS SECTION
+───────────────────────────────────────────────────────────*/
 .projects-grid {
   display: grid;
   gap: 2.5rem;
@@ -447,10 +570,9 @@ section {
   font-size: 1rem;
 }
 
-.contact {
-  background: linear-gradient(to bottom, rgba(20, 10, 40, 0.8), rgba(10, 10, 26, 0.8));
-}
-
+/*───────────────────────────────────────────────────────────
+  CONTACT SECTION
+───────────────────────────────────────────────────────────*/
 .contact-form {
   max-width: 600px;
   margin: 0 auto;
@@ -489,6 +611,9 @@ section {
   margin-top: 1rem;
 }
 
+/*───────────────────────────────────────────────────────────
+  FOOTER
+───────────────────────────────────────────────────────────*/
 footer {
   text-align: center;
   padding: 3rem 2rem;
@@ -529,7 +654,29 @@ footer p {
   box-shadow: 0 0 15px var(--primary-color);
 }
 
-/* Responsive */
+.collision-effect {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 2px solid var(--accent-color);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  transform: translate(-50%, -50%);
+  animation: collision-ripple 0.5s ease-out forwards;
+}
+
+@keyframes collision-ripple {
+  to {
+    width: 50px;
+    height: 50px;
+    opacity: -0.2;
+  }
+}
+
+/*───────────────────────────────────────────────────────────
+  RESPONSIVE STYLES
+───────────────────────────────────────────────────────────*/
 @media (max-width: 900px) {
   .nav .menu { display: none; }
   .hamburger { display: block; }

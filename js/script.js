@@ -1,159 +1,380 @@
 // script.js
-const area = document.getElementById('interactive-area');
+// ────────────────────────────────────────────────────────────
+// Enhanced physics: elastic collision + cursor-speed impulse
+
+// 1) Grab the interactive area & balls
+const area = document.querySelector('.interactive-area');
 const bb   = document.querySelector('.bouncing-ball');
 const ub   = document.querySelector('.user-ball');
 
-const bbR = 15, ubR = 15;       // radii
-let   bbX = 50, bbY = 50;       // initial position
-let   bbVX = 4, bbVY = 3;       // velocity
+const extraBalls = [];
+const CRAZY_COUNT = 3;    // how many to spawn
+const CRAZY_SPEED = 20; 
+const crazySound = document.getElementById('crazy-sound');
 
+const bbR = 15, ubR = 15;       // radii
+let   bbX = 50, bbY = 50;       // position
+let   bbVX = 2, bbVY = 1.5;       // velocity
+let lastClientX = null;
+let lastClientY = null;
+let userX = 0, userY = 0;
+crazySound.volume = 0.1;
+
+// 1.1) Track user-ball (cursor) velocity
+let lastMouseX = 0, lastMouseY = 0;
+let userVX = 0, userVY = 0;
+let lastMouseTime = performance.now();
+
+
+function spawnCrazyBalls(count) {
+  for (let i = 0; i < count; i++) {
+    const ballEl = document.createElement('div');
+    ballEl.classList.add('ball', 'extra-ball');
+    area.appendChild(ballEl);
+
+    // random start inside the area
+    const x  = Math.random() * (area.clientWidth  - 2*bbR);
+    const y  = Math.random() * (area.clientHeight - 2*bbR);
+    const vx = (Math.random()*2 - 1) * CRAZY_SPEED;
+    const vy = (Math.random()*2 - 1) * CRAZY_SPEED;
+
+    extraBalls.push({ el: ballEl, x, y, vx, vy });
+  }
+}
+
+document
+  .getElementById('go-crazy-btn')
+  .addEventListener('click', () => {
+    // reset to start in case it’s mid-play
+    crazySound.currentTime = 0;
+    crazySound.play().catch(err => {
+      // autoplay policies might block before user interaction—
+      // but since this is inside a click handler it should be fine.
+      console.warn('Audio play failed:', err);
+    });
+
+    // …then spawn your balls as before
+    spawnCrazyBalls(CRAZY_COUNT);
+});
+
+
+// 2) Helper: compute the bouncing-ball’s center in the particles canvas
+function getBallCenter() {
+  const container = tsParticles.domItem(0);
+  if (!container) return { x: 0, y: 0 };
+
+  const canvasRect = container.canvas.element.getBoundingClientRect();
+  const ballRect   = bb.getBoundingClientRect();
+
+  return {
+    x: ballRect.left + ballRect.width  / 2 - canvasRect.left,
+    y: ballRect.top  + ballRect.height / 2 - canvasRect.top
+  };
+}
+
+// 3) Manual repulse logic (unchanged)
+function applyBallRepulse() {
+  const container = tsParticles.domItem(0);
+  if (!container) return;
+  const particles = container.particles.filter(() => true);
+  const { x: bx, y: by } = getBallCenter();
+
+  const RADIUS   = 200;
+  const STRENGTH = 0.3;
+
+  for (const p of particles) {
+    const dx   = p.position.x - bx;
+    const dy   = p.position.y - by;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist > 0 && dist < RADIUS) {
+      const force = (1 - dist / RADIUS) * STRENGTH;
+      p.velocity.x += (dx / dist) * force;
+      p.velocity.y += (dy / dist) * force;
+    }
+  }
+}
+
+// 4) Main loop: move, bounce, collide, repel, render
 function tick() {
-  // 1) move
+  // — MOVE the bouncing ball
   bbX += bbVX;
   bbY += bbVY;
 
-  // 2) bounce off walls
-  if (bbX <= 0) {
-    bbX = 0; bbVX = -bbVX;
-  } else if (bbX + 2*bbR >= area.clientWidth) {
-    bbX = area.clientWidth - 2*bbR; bbVX = -bbVX;
-  }
-  if (bbY <= 0) {
-    bbY = 0; bbVY = -bbVY;
-  } else if (bbY + 2*bbR >= area.clientHeight) {
-    bbY = area.clientHeight - 2*bbR; bbVY = -bbVY;
-  }
+  // — BOUNCE off walls
+  if (bbX <= 0 || bbX + 2 * bbR >= area.clientWidth)  bbVX = -bbVX;
+  if (bbY <= 0 || bbY + 2 * bbR >= area.clientHeight) bbVY = -bbVY;
 
-  // 3) bounce off user ball
+  // — COLLIDE with user-ball using elastic collision + impulse
   const A      = area.getBoundingClientRect();
-  const ubRect = ub.getBoundingClientRect();
-  const ux     = ubRect.left - A.left;
-  const uy     = ubRect.top  - A.top;
+  const ubRct  = ub.getBoundingClientRect();
+  const ux     = ubRct.left - A.left;
+  const uy     = ubRct.top  - A.top;
   const dx     = (bbX + bbR) - (ux + ubR);
   const dy     = (bbY + bbR) - (uy + ubR);
   const dist   = Math.hypot(dx, dy);
 
   if (dist < bbR + ubR) {
-    bbVX = -bbVX; bbVY = -bbVY;
-    const angle = Math.atan2(dy, dx);
-    bbX = ux + ubR - bbR + Math.cos(angle)*(bbR+ubR);
-    bbY = uy + ubR - bbR + Math.sin(angle)*(bbR+ubR);
+    // collision normal
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    const midX = bbX + bbR + (dx * 0.5);
+    const midY = bbY + bbR + (dy * 0.5);
+    spawnCollisionEffect(midX, midY);
+    // elastic reflect with restitution
+    const restitution = 0.9;
+    const vDotN = bbVX * nx + bbVY * ny;
+    bbVX = bbVX - (1 + restitution) * vDotN * nx;
+    bbVY = bbVY - (1 + restitution) * vDotN * ny;
+
+    // add a bit of your cursor’s velocity
+    const impulseScale = 0.0015;
+    bbVX += userVX * impulseScale;
+    bbVY += userVY * impulseScale;
+
+    // push out of overlap
+    const overlap = bbR + ubR - dist;
+    bbX += nx * overlap;
+    bbY += ny * overlap;
   }
 
-  // 4) render
+  // — BOUNCE off walls
+  if (bbX <= 0) {
+    spawnCollisionEffect(bbR, bbY + bbR);
+  }
+  if (bbX + 2 * bbR >= area.clientWidth) {
+    spawnCollisionEffect(area.clientWidth - bbR, bbY + bbR);
+  }
+  if (bbY <= 0) {
+    spawnCollisionEffect(bbX + bbR, bbR);
+  }
+  if (bbY + 2 * bbR >= area.clientHeight) {
+    spawnCollisionEffect(bbX + bbR, area.clientHeight - bbR);
+  }
+
+  // — REPEL nearby particles
+  applyBallRepulse();
+
+  // — RENDER the ball
   bb.style.transform = `translate(${bbX}px, ${bbY}px)`;
+
+
+  // — UPDATE extra balls with user‐ball collisions
+for (const b of extraBalls) {
+  // 1) MOVE
+  b.x += b.vx;
+  b.y += b.vy;
+
+  // 2) WALL BOUNCES + EFFECT
+  // Left wall
+  if (b.x <= 0) {
+    b.x = 0;
+    b.vx = -b.vx;
+    spawnCollisionEffect(b.x + bbR, b.y + bbR);
+  }
+  // Right wall
+  if (b.x + 2 * bbR >= area.clientWidth) {
+    b.x = area.clientWidth - 2 * bbR;
+    b.vx = -b.vx;
+    spawnCollisionEffect(b.x + bbR, b.y + bbR);
+  }
+  // Top wall
+  if (b.y <= 0) {
+    b.y = 0;
+    b.vy = -b.vy;
+    spawnCollisionEffect(b.x + bbR, b.y + bbR);
+  }
+  // Bottom wall
+  if (b.y + 2 * bbR >= area.clientHeight) {
+    b.y = area.clientHeight - 2 * bbR;
+    b.vy = -b.vy;
+    spawnCollisionEffect(b.x + bbR, b.y + bbR);
+  }
+
+  // 3) USER‐BALL COLLISION + EFFECT
+  const dxUB = (b.x + bbR) - (userX + ubR);
+  const dyUB = (b.y + bbR) - (userY + ubR);
+  const distUB = Math.hypot(dxUB, dyUB);
+
+  if (distUB < bbR + ubR) {
+    // reflect velocity
+    const nx = dxUB / distUB;
+    const ny = dyUB / distUB;
+    const vDotN = b.vx * nx + b.vy * ny;
+    b.vx = b.vx - 2 * vDotN * nx;
+    b.vy = b.vy - 2 * vDotN * ny;
+
+    // optional impulse
+    b.vx += userVX * 0.02;
+    b.vy += userVY * 0.02;
+
+    // push out of overlap
+    const overlap = bbR + ubR - distUB;
+    b.x += nx * overlap;
+    b.y += ny * overlap;
+
+    // spawn effect at collision point
+    const midX = b.x + bbR;
+    const midY = b.y + bbR;
+    spawnCollisionEffect(midX, midY);
+  }
+
+  // 4) RENDER
+  b.el.style.transform = `translate(${b.x}px, ${b.y}px)`;
+}
+
+  // — NEXT FRAME
   requestAnimationFrame(tick);
 }
 
-tick();
+function spawnCollisionEffect(cx, cy) {
+  const ripple = document.createElement('div');
+  ripple.className = 'collision-effect';
+  ripple.style.left = `${cx}px`;
+  ripple.style.top  = `${cy}px`;
+  area.appendChild(ripple);
+  // remove after animation
+  setTimeout(() => area.removeChild(ripple), 500);
+}
 
-// user-ball follows cursor
+// 5) user-ball follows cursor & we compute its velocity
 area.addEventListener('mousemove', e => {
   const A = area.getBoundingClientRect();
-  const x = e.clientX - A.left - ubR;
-  const y = e.clientY - A.top  - ubR;
-  ub.style.transform = `translate(${x}px, ${y}px)`;
+  const now = performance.now();
+  const dt = (now - lastMouseTime) / 1000 || 0.016;
+
+  // new position of user-ball
+  const curX = e.clientX - A.left - ubR;
+  const curY = e.clientY - A.top  - ubR;
+
+  lastClientX = e.clientX;
+  lastClientY = e.clientY;
+
+  // compute velocity (px/sec)
+  userVX = (curX - lastMouseX) / dt;
+  userVY = (curY - lastMouseY) / dt;
+
+  // store for next frame
+  lastMouseX = curX;
+  lastMouseY = curY;
+  lastMouseTime = now;
+
+  ub.style.transform = `translate(${curX}px, ${curY}px)`;
+
+  userX = curX;
+  userY = curY;
 });
-
-tsParticles.load('particles', {
-  particles: {
-    number: { value: 30, density: { enable: true, area: 800 } },
-    color: { value: '#ececec' },
-    shape: { type: 'circle' },
-
-    // Add a soft glow via shadow
-    shadow: {
-      enable: true,
-      blur: 8,
-      color: { value: '#ececec' }
-    },
-
-    // Tiny size variation + animating size for more life
-    size: {
-      value: { min: 1, max: 3 },
-      animation: {
-        enable: true,
-        speed: 1.5,
-        minimumValue: 1,
-        sync: false
-      }
-    },
-
-    // Twinkle effect: random brighten/darken flashes
-    twinkle: {
-      particles: {
-        enable: true,
-        frequency: 0.05,
-        opacity: 0.6
-      }
-    },
-
-    opacity: {
-      value: 0.3,
-      animation: {
-        enable: true,
-        speed: 0.5,
-        minimumValue: 0.1,
-        sync: false
-      }
-    },
-
-    move: {
-      enable: true,
-      speed: 0.5, // Slower base speed for better scroll effect
-      outModes: 'bounce',
-      direction: 'none' // Start with no direction
-    }
-  },
-
-  interactivity: {
-    events: {
-      onHover: { enable: true, mode: 'repulse' },
-      resize: true
-    },
-    modes: {
-      repulse: { distance: 40, duration: 0.4 }
-    }
-  },
-
-  detectRetina: true
-});
-
-let lastScrollY = window.scrollY || window.pageYOffset;
-let scrollVelocity = 0;
-let scrollTimer = null;
 
 window.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY || window.pageYOffset;
+  // if we haven’t seen the cursor move yet, bail
+  if (lastClientX === null || lastClientY === null) return;
 
-  // Determine scroll direction
-  scrollDirection = currentScrollY > lastScrollY ? 1 : 
-                   (currentScrollY < lastScrollY ? -1 : 0);
+  const A = area.getBoundingClientRect();
+  // same math as in mousemove…
+  const curX = lastClientX - A.left - ubR;
+  const curY = lastClientY - A.top  - ubR;
 
-  lastScrollY = currentScrollY;
+  ub.style.transform = `translate(${curX}px, ${curY}px)`;
 
-  // Get particles instance
-  const particles = tsParticles.domItem(0);
-  if (!particles || !particles.options?.particles?.move) return;
-
-  // Update particle movement based on scroll
-  if (scrollDirection === 1) {
-    // Scrolling down - particles move up faster
-    particles.options.particles.move.direction = 'top';
-    particles.options.particles.move.speed = 3;
-  } else if (scrollDirection === -1) {
-    // Scrolling up - particles move down slower
-    particles.options.particles.move.direction = 'bottom';
-    particles.options.particles.move.speed = 3;
-  } else {
-    // No scrolling - random movement
-    particles.options.particles.move.direction = 'none';
-    particles.options.particles.move.speed = 0.5;
-  }
-
-  // Force particle update
-  particles.refresh();
+  userX = curX;
+  userY = curY; 
 });
 
-// Initialize particles with neutral movement
+// 6) tsParticles config (unchanged)
+const particlesConfig = {
+  particles: {
+    number: { value: 15, density: { enable: true, area: 800 } },
+    color: { value: '#ececec' },
+    shape: { type: 'circle' },
+    shadow: { enable: true, blur: 8, color: { value: '#ececec' } },
+    size: { value: { min: 1, max: 4 }, animation: { enable: true, speed: 1.5, minimumValue: 1, sync: false } },
+    twinkle: { particles: { enable: true, frequency: 0.05, opacity: 0.6 } },
+    opacity: { value: 0.3, animation: { enable: true, speed: 0.5, minimumValue: 0.1, sync: false } },
+    move: { enable: true, speed: 0.5, outModes: 'bounce', direction: 'none' }
+  },
+  interactivity: {
+    events: { onHover: { enable: true, mode: 'repulse' }, resize: true },
+    modes: { repulse: { distance: 100, duration: 0.4 } }
+  },
+  detectRetina: true
+};
+
+// 7) Load tsParticles, then start tick()
+tsParticles.load('particles', particlesConfig).then(container => {
+  console.log('✅ tsParticles loaded with', container.particles.filter(() => true).length, 'particles');
+  tick();
+});
+
+// 8) Scroll-based tweaks (unchanged)
+let lastScrollY = window.scrollY || window.pageYOffset;
+window.addEventListener('scroll', () => {
+  const currentScrollY = window.scrollY || window.pageYOffset;
+  const dir = currentScrollY > lastScrollY ? 'top' :
+              currentScrollY < lastScrollY ? 'bottom' : 'none';
+  lastScrollY = currentScrollY;
+
+  const p = tsParticles.domItem(0);
+  if (!p) return;
+  if (dir === 'top' || dir === 'bottom') {
+    p.options.particles.move.direction = dir;
+    p.options.particles.move.speed     = 3;
+  } else {
+    p.options.particles.move.direction = 'none';
+    p.options.particles.move.speed     = 0.5;
+  }
+  p.refresh();
+});
+
+const ubInner = ub.querySelector('.user-ball-inner');
+
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ubInner.classList.add('wobble');
+  });
+});
+
+
+ubInner.addEventListener('animationend', () => {
+  ubInner.classList.remove('wobble');
+});
+
+document.getElementById('go-crazy-btn').addEventListener('click', () => {
+  spawnCrazyBalls(CRAZY_COUNT);
+});
+
+
+// // 1) grab eyes
+// const eyes = document.querySelectorAll('.eye');
+
+// // 2) on mousemove, update each pupil
+// area.addEventListener('mousemove', e => {
+//   const eyes = document.querySelectorAll('.eye');
+//   eyes.forEach(eye => {
+//     const pupil = eye.querySelector('.pupil');
+//     const eyeRect = eye.getBoundingClientRect();
+
+//     // center of the eye
+//     const eyeCX = eyeRect.left + eyeRect.width  / 2;
+//     const eyeCY = eyeRect.top  + eyeRect.height / 2;
+
+//     // vector to cursor
+//     const dx = e.clientX - eyeCX;
+//     const dy = e.clientY - eyeCY;
+//     const angle = Math.atan2(dy, dx);
+
+//     // max distance so pupil stays inside eye
+//     const maxOffset = (eyeRect.width - pupil.offsetWidth) / 2 - 2;
+
+//     const offsetX = Math.cos(angle) * maxOffset;
+//     const offsetY = Math.sin(angle) * maxOffset;
+
+//     // **here** we retain the original centering translate
+//     pupil.style.transform =
+//       `translate(-50%, -50%) translate(${offsetX}px, ${offsetY}px)`;
+//   });
+// });
+
+
 window.dispatchEvent(new Event('scroll'));
