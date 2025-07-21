@@ -192,6 +192,8 @@ body::before {
   justify-content: center;
   align-items: center;
   position: absolute;
+  padding-top: var(--nav-height);
+  height: calc(100vh - var(--nav-height));
   right: 50px;
   z-index: 1;
 }
