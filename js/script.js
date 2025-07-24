@@ -2,6 +2,7 @@
 // ────────────────────────────────────────────────────────────
 // Enhanced physics: elastic collision + cursor-speed impulse
 
+
 // 1) Grab the interactive area & balls
 const area = document.querySelector('.interactive-area');
 const bb   = document.querySelector('.bouncing-ball');
@@ -24,6 +25,14 @@ crazySound.volume = 0.1;
 let lastMouseX = 0, lastMouseY = 0;
 let userVX = 0, userVY = 0;
 let lastMouseTime = performance.now();
+
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.body.scrollHeight - window.innerHeight;
+  const scrolled = (scrollTop / docHeight) * 100;
+  document.getElementById('scroll-progress').style.width = `${scrolled}%`;
+});
 
 
 function spawnCrazyBalls(count) {
@@ -79,8 +88,8 @@ function applyBallRepulse() {
   const particles = container.particles.filter(() => true);
   const { x: bx, y: by } = getBallCenter();
 
-  const RADIUS   = 200;
-  const STRENGTH = 0.3;
+  const RADIUS   = 250;
+  const STRENGTH = 0.1;
 
   for (const p of particles) {
     const dx   = p.position.x - bx;
@@ -378,3 +387,31 @@ document.getElementById('go-crazy-btn').addEventListener('click', () => {
 
 
 window.dispatchEvent(new Event('scroll'));
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Register the plugin
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Create a timeline for the scroll-based animation
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: '.hero',
+            start: 'top top',
+            end: '+=100%', // Animate over a scroll distance equal to 100% of viewport height
+            scrub: 1, // Smoothly scrubs the animation in relation to scroll position
+            pin: true, // Pins the hero section during the animation
+            pinSpacing: true, // Adds padding to prevent content jump
+        }
+    });
+
+    // Add the animations to the timeline
+    tl.to('.hero', {
+        yPercent: -20,
+        scale: 0.8, // Pans back
+        opacity: 0, // Fades out
+        filter: 'blur(5px)', // Blurs out
+        ease: 'power2.inOut', // Easing function for a smooth effect
+    });
+
+    
+});

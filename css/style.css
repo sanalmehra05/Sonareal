@@ -37,7 +37,7 @@
 body {
   background: linear-gradient(0deg, rgba(102, 180, 243, 0.041) 0%, rgba(0, 0, 0, 0.20) 100%),
     radial-gradient(ellipse 50.00% 50.00% at 50.00% 50.00%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0.21) 0%, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.27) 0%, rgba(0, 0, 0, 0.28) 100%, rgba(0, 0, 0, 0.28) 100%, rgba(0, 0, 0, 0.29) 100%),
-    radial-gradient(ellipse 50.00% 50.00% at 50.00% 50.00%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.06) 32%, rgba(0, 0, 0, 0.10) 50%, rgba(0, 0, 0, 0.13) 100%), rgba(27, 29, 42, 0.44); 
+    radial-gradient(ellipse 50.00% 50.00% at 50.00% 50.00%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.06) 32%, rgba(0, 0, 0, 0.10) 50%, rgba(0, 0, 0, 0.13) 100%), rgba(27, 29, 42, 0.44);
   color: var(--text-color);
   line-height: 1.6;
   font-family: 'Eina01-Bold', sans-serif;
@@ -69,6 +69,19 @@ body::before {
 /*───────────────────────────────────────────────────────────
   NAVIGATION BAR
 ───────────────────────────────────────────────────────────*/
+
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+  width: 0%;
+  z-index: 9999;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -415,7 +428,7 @@ body::before {
 .section-title {
   text-align: center;
   margin-bottom: 3rem;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Eina01-Bold';
   font-size: 2.5rem;
   letter-spacing: 2px;
   position: relative;
@@ -440,7 +453,12 @@ section {
 /*───────────────────────────────────────────────────────────
   ABOUT SECTION
 ───────────────────────────────────────────────────────────*/
+.about{
+  font-family: "Eina01-Regular";
+}
+
 .about-content {
+  font-family: "Eina01-Regular";
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
@@ -571,6 +589,108 @@ section {
   padding: 0.8rem 1.8rem;
   font-size: 1rem;
 }
+
+/*───────────────────────────────────────────────────────────
+  Services SECTION
+───────────────────────────────────────────────────────────*/
+
+.bundles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+}
+
+.bundle-card {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 15px;
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--transition);
+}
+
+
+.bundle-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 30px rgba(102, 180, 243, 0.3);
+}
+
+.bundle-card h3 {
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.bundle-card ul {
+  list-style: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.bundle-card li::before {
+  content: '• ';
+  color: var(--primary-color);
+}
+
+.bundle-card .tagline {
+  margin-top: 1rem;
+  font-style: italic;
+  color: var(--secondary-color);
+}
+
+.sub-section-title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--accent-color);
+}
+
+.addons-table {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.addon-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text-color);
+}
+
+
+.bundle-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.bundle-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: var(--primary-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease;
+  z-index: -1;
+}
+
+.bundle-card:hover::before {
+  transform: scaleX(1);
+}
+
 
 /*───────────────────────────────────────────────────────────
   CONTACT SECTION
