@@ -415,3 +415,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 });
+
+ // Register the ScrollTrigger plugin with GSAP
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const curvedGrid = document.querySelector('.curved-grid');
+            const numberOfStrips = 40; // More strips make a smoother curve
+            const stripWidthVW = 5; // Width of each strip in vw units
+            const totalWidthVW = numberOfStrips * stripWidthVW;
+
+            // Create and position the grid strips
+            for (let i = 0; i < numberOfStrips; i++) {
+                const strip = document.createElement('div');
+                strip.className = 'grid-strip';
+                strip.style.width = `${stripWidthVW}vw`;
+                
+                // Calculate position and rotation for each strip to form a curve
+                const angle = (i / (numberOfStrips - 1) - 0.5) * 100; // Total curve angle
+                const radius = 350; // Radius of the curve in pixels
+                
+                // Position strips from left to right
+                const leftPosition = (i * stripWidthVW) - ((totalWidthVW - 100) / 2);
+                
+                strip.style.left = `${leftPosition}vw`;
+                
+                // Apply 3D transform to create the curve
+                // We rotate each strip on its Y-axis and push it back in Z-space
+                strip.style.transform = `rotateY(${angle}deg) translateZ(-${radius}px)`;
+                
+                // Adjust background position for each strip to make the grid seamless
+                strip.style.backgroundPositionX = `${-i * 60 * (stripWidthVW / 5)}px`;
+
+                curvedGrid.appendChild(strip);
+            }
+
+            // Set an initial state for the grid container
+            gsap.set(".curved-grid", { y: -150 });
+
+            // Create the scroll-triggered animation for the entire curved grid
+            gsap.to(".curved-grid", {
+                scrollTrigger: {
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1.5,
+                },
+                y: 150, // Move the entire curved grid on the Y-axis
+                ease: "power1.inOut"
+            });
+        });
