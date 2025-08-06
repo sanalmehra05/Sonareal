@@ -32,51 +32,6 @@
 }
 
 
-.grid-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Place it behind the content */
-            perspective: 1000px; /* The perspective from which we view the 3D scene */
-        }
-
-        /* The container for all the grid strips, which will be rotated as a whole */
-        .curved-grid {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d; /* This is crucial for nesting 3D elements */
-            transform: rotateX(50deg); /* Tilts the entire curved grid back */
-            will-change: transform;
-        }
-
-        /* Individual vertical strips that form the curved surface */
-        .grid-strip {
-            position: absolute;
-            top: -75vh; /* Position strips to fill the view vertically */
-            height: 250vh;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-            background-size: 60px 60px;
-            transform-origin: center center; /* Rotate strips around their own center */
-            will-change: transform;
-        }
-
-        /* The content that will appear over the grid */
-        .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Make content section take full viewport height */
-            text-align: center;
-            padding: 2rem;
-        }
         
 /*───────────────────────────────────────────────────────────
   BODY & BACKGROUND STYLES
@@ -141,6 +96,23 @@ body::before {
   padding: 0 3rem;
   z-index: 100;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#video-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 
 /* Logo */

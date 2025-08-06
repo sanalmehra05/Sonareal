@@ -27,6 +27,38 @@ let userVX = 0, userVY = 0;
 let lastMouseTime = performance.now();
 
 
+const video = document.getElementById("bg-video");
+video.pause();
+video.currentTime = 0;
+
+let targetTime = 0;
+let seeking = false;
+
+// Listen for seek events to avoid flooding the player
+video.addEventListener("seeking", () => (seeking = true));
+video.addEventListener("seeked", () => (seeking = false));
+
+video.addEventListener("loadedmetadata", () => {
+    const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+    // Update target video time based on scroll position
+    window.addEventListener("scroll", () => {
+    const scrollTop = window.scrollY;
+    const scrollFraction = scrollTop / maxScroll;
+    targetTime = scrollFraction * video.duration;
+    });
+
+    // Animation loop using requestAnimationFrame
+    function animate() {
+    if (!seeking) {
+        video.currentTime = targetTime;
+    }
+    requestAnimationFrame(animate);
+    }
+
+    animate(); // Start the loop
+});
+
 window.addEventListener('scroll', () => {
   const scrollTop = window.scrollY;
   const docHeight = document.body.scrollHeight - window.innerHeight;
