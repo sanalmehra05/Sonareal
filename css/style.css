@@ -219,7 +219,7 @@ video {
   width: 100%;
   height: 100%;
 }
-
+/* 
 .anime-character-wrapper {
   display: flex;
   justify-content: center;
@@ -227,7 +227,7 @@ video {
   position: absolute;
   right: 50px;
   z-index: 1;
-}
+} */
 
 /* Eye white */
 /* .eye {
@@ -755,8 +755,9 @@ section {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(3px);
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(102, 180, 243, 0.15);
 }
@@ -816,7 +817,6 @@ section {
   box-shadow: 0 0 15px rgba(102, 180, 243, 0.25);
   transition: transform 0.5s ease;
 }
-
 
 
 .bundle-card {
