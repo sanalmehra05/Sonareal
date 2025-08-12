@@ -28,36 +28,41 @@ let lastMouseTime = performance.now();
 
 
 const video = document.getElementById("bg-video");
+video.loop = true; // <-- Add this line to make the video loop
 video.pause();
 video.currentTime = 0;
+video.play(); // <-- Play automatically
 
 let targetTime = 0;
 let seeking = false;
 
 // Listen for seek events to avoid flooding the player
-video.addEventListener("seeking", () => (seeking = true));
-video.addEventListener("seeked", () => (seeking = false));
+// video.addEventListener("seeking", () => (seeking = true));
+// video.addEventListener("seeked", () => (seeking = false));
 
-video.addEventListener("loadedmetadata", () => {
-    const maxScroll = document.body.scrollHeight - window.innerHeight;
+// video.addEventListener("loadedmetadata", () => {
+//     const maxScroll = document.body.scrollHeight - window.innerHeight;
 
-    // Update target video time based on scroll position
-    window.addEventListener("scroll", () => {
-    const scrollTop = window.scrollY;
-    const scrollFraction = scrollTop / maxScroll;
-    targetTime = scrollFraction * video.duration;
-    });
+//     // Update target video time based on scroll position
+//     window.addEventListener("scroll", () => {
+//     const scrollTop = window.scrollY;
+//     const scrollFraction = scrollTop / maxScroll;
+//     targetTime = scrollFraction * video.duration;
+//     });
 
-    // Animation loop using requestAnimationFrame
-    function animate() {
-    if (!seeking) {
-        video.currentTime = targetTime;
-    }
-    requestAnimationFrame(animate);
-    }
+//     // Animation loop using requestAnimationFrame
+//     function animate() {
+//     if (!seeking) {
+//         video.currentTime = targetTime;
+//     }
+//     requestAnimationFrame(animate);
+//     }
 
-    animate(); // Start the loop
-});
+//     animate(); // Start the loop
+// });
+
+// ...existing code...
+
 
 window.addEventListener('scroll', () => {
   const scrollTop = window.scrollY;
@@ -348,24 +353,24 @@ tsParticles.load('particles', particlesConfig).then(container => {
 });
 
 // 8) Scroll-based tweaks (unchanged)
-let lastScrollY = window.scrollY || window.pageYOffset;
-window.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY || window.pageYOffset;
-  const dir = currentScrollY > lastScrollY ? 'top' :
-              currentScrollY < lastScrollY ? 'bottom' : 'none';
-  lastScrollY = currentScrollY;
+// let lastScrollY = window.scrollY || window.pageYOffset;
+// window.addEventListener('scroll', () => {
+//   const currentScrollY = window.scrollY || window.pageYOffset;
+//   const dir = currentScrollY > lastScrollY ? 'top' :
+//               currentScrollY < lastScrollY ? 'bottom' : 'none';
+//   lastScrollY = currentScrollY;
 
-  const p = tsParticles.domItem(0);
-  if (!p) return;
-  if (dir === 'top' || dir === 'bottom') {
-    p.options.particles.move.direction = dir;
-    p.options.particles.move.speed     = 3;
-  } else {
-    p.options.particles.move.direction = 'none';
-    p.options.particles.move.speed     = 0.5;
-  }
-  p.refresh();
-});
+//   const p = tsParticles.domItem(0);
+//   if (!p) return;
+//   if (dir === 'top' || dir === 'bottom') {
+//     p.options.particles.move.direction = dir;
+//     p.options.particles.move.speed     = 3;
+//   } else {
+//     p.options.particles.move.direction = 'none';
+//     p.options.particles.move.speed     = 0.5;
+//   }
+//   p.refresh();
+// });
 
 const ubInner = ub.querySelector('.user-ball-inner');
 
@@ -444,6 +449,4 @@ document.addEventListener('DOMContentLoaded', () => {
         filter: 'blur(5px)', // Blurs out
         ease: 'power2.inOut', // Easing function for a smooth effect
     });
-
-    
 });
