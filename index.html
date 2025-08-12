@@ -7,9 +7,10 @@
   <title>Cyber Portfolio</title>
   <link rel="stylesheet" href="./css/style.css">
 </head>
-<div id="particles"></div>
+<!-- <div id="particles"></div> -->
 <audio id="crazy-sound" src="./assets/crazy.mp3" preload="auto"></audio>
 <body class="interactive-area" id="interactive-area">
+  
 
   <div id="scroll-progress"></div>
   <nav class="nav">
@@ -21,7 +22,7 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-button">
-          <a href="#" class="btn">Dream</a>
+          <a href="./dream.html" class="btn">Dream</a>
       </div>
     <button class="hamburger">☰</button>
   </nav>
@@ -31,24 +32,27 @@
     <div class="user-ball-inner"></div>
   </div>
   
-  <div class="grid-container">
-        <div class="curved-grid"></div>
-    </div>
   <section class="hero">
-      <div class="anime-character-wrapper">
+      <div id="video-container">
+        <video id="bg-video" preload="auto" muted>
+          <source src="./assets/bgvid.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+    </div>
+      <!-- <div class="anime-character-wrapper">
         <img
           class="anime-character"
           src="./assets/image 1.png"
           alt="Anime Character"
-        />
+        /> -->
         <!-- Eyes overlay
         <div class="eye eye-left">
           <div class="pupil"></div>
         </div>
         <div class="eye eye-right">
           <div class="pupil"></div>
-        </div> -->
-      </div>
+        </div> 
+      </div> -->
       
 
       <div class="hero-content">
@@ -120,54 +124,60 @@
   </section>
 
   <section id="services" class="services">
-  <h2 class="section-title">Services</h2>
+  <h2 class="section-title">Pricing</h2>
 
   <div class="bundles-flex">
-    <div class="bundle-card">
-      <h3>Starter Bundle – $199 AUD</h3>
-      <ul>
-        <li>One-page responsive scrollable website</li>
-        <li>Minimal but modern design (static content)</li>
-        <li>Sectioned layout (About, Services, Contact)</li>
-        <li>Mobile-friendly</li>
-        <li>One revision</li>
-        <li>Hosting guidance</li>
-        <li class="tagline">✅ Great for students, personal brands, or info sites</li>
+    <div class="bundle-card starter">
+      <div class="card-heading">Starter<br>Bundle</div>
+      <ul >
+        <div class="card-pricing">$199 AUD</div>
+        <li>Cost-effective launch</li>
+        <li>Sleek one-page design</li>
+        <li>Mobile-ready</li>
+        <div class="tagline">Great for students, personal brands, or small info sites</div>
       </ul>
+      <div class="plan-container">
+        <a href="#" class="btn plan">Choose Plan</a>
+      </div>
     </div>
-    <div class="bundle-card">
-      <h3>Basic Bundle – $399 AUD</h3>
-      <ul>
-        <li>Custom 3-page responsive website</li>
-        <li>Clean layout with personalized branding</li>
-        <li>Hosting & domain setup help</li>
-        <li>One round of revisions</li>
-        <li class="tagline">✅ For small businesses or portfolios</li>
+    <div class="bundle-card basic">
+      <div class="card-heading">Basic<br>Bundle</div>
+      <ul >
+        <div class="card-pricing">$399 AUD</div>
+        <li>Multi-page structure</li>
+        <li>Custom styling</li>
+        <li>Hosting & domain help</li>
+        <div class="tagline">For small businesses or portfolios</div>
       </ul>
+      <div class="plan-container">
+        <a href="#" class="btn plan">Choose Plan</a>
+      </div>
     </div>
-    <div class="bundle-card">
-      <h3>Enhanced Bundle – $799 AUD</h3>
-      <ul>
-        <li>All Basic features</li>
-        <li>Light animations (hover, fade, parallax)</li>
-        <li>Spam-protected contact form</li>
-        <li>Mobile & browser optimization</li>
-        <li>Two revisions</li>
-        <li>SSL setup help</li>
-        <li class="tagline">✅ For brands needing polish & interactivity</li>
+    <div class="bundle-card enhanced">
+      <div class="card-heading">Enhanced<br>Bundle</div>
+      <ul >
+        <div class="card-pricing">$799 AUD</div>
+        <li>Smooth animations & effects</li>
+        <li>Optimized performance</li>
+        <li>Extra revisions & SSL</li>
+        <div class="tagline">For brands needing polish & interactivity</div>
       </ul>
+      <div class="plan-container">
+        <a href="#" class="btn plan">Choose Plan</a>
+      </div>
     </div>
-    <div class="bundle-card">
-      <h3>Premium Bundle – $1,499 AUD</h3>
+    <div class="bundle-card premium">
+      <div class="card-heading">Premium<br>Bundle</div>
       <ul>
-        <li>All Enhanced features</li>
-        <li>Full design: wireframe + mockups</li>
-        <li>Hero animations, scroll effects, video</li>
-        <li>Blog or gallery integration</li>
-        <li>SEO-ready optimization</li>
-        <li>14-day post-launch support</li>
-        <li class="tagline">✅ For standout brands & premium experiences</li>
+        <div class="card-pricing">$1,499 AUD</div>
+        <li>Full design process</li>
+        <li>Advanced visuals</li>
+        <li>Growth-ready</li>
+        <div class="tagline">For standout businesses or creators needing high-end quality</div>
       </ul>
+      <div class="plan-container">
+        <a href="#" class="btn plan">Choose Plan</a>
+      </div>
     </div>
   </div>
 

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Three.js — Interactive Model Viewer</title>
+  <style>html,body{height:100%;margin:0} canvas{display:block}</style>
+
+  <!-- Import map: lets us write import 'three' and 'three/addons/...' -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  // Optional minimal UI (no build tools)
+  import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.18/+esm';
+
+  // --- Scene / Camera / Renderer ---
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a0a);
+
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100);
+  camera.position.set(0.5, 1.6, 3.2);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+
+  // --- Lights ---
+  const amb = new THREE.AmbientLight(0xffffff, 0.35);
+  scene.add(amb);
+
+  const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+  sun.position.set(2.5, 5, 2);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.camera.near = 0.1;
+  sun.shadow.camera.far = 20;
+  sun.shadow.camera.left = -6;
+  sun.shadow.camera.right = 6;
+  sun.shadow.camera.top = 6;
+  sun.shadow.camera.bottom = -6;
+  scene.add(sun);
+
+  // --- Textured floor (receives shadows) ---
+  const texLoader = new THREE.TextureLoader();
+  const gridTex = texLoader.load('https://threejs.org/examples/textures/uv_grid_opengl.jpg');
+  gridTex.wrapS = gridTex.wrapT = THREE.RepeatWrapping;
+  gridTex.repeat.set(6, 6);
+  gridTex.colorSpace = THREE.SRGBColorSpace;
+
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(18, 18),
+    new THREE.MeshStandardMaterial({ map: gridTex, roughness: 0.95, metalness: 0.0 })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = -1;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // --- Load model (Khronos sample: Damaged Helmet) ---
+  const loader = new GLTFLoader();
+  const MODEL_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb';
+
+  const pickable = [];  // meshes you can hover/click
+  let modelRoot = null;
+
+  loader.load(
+    MODEL_URL,
+    (gltf) => {
+      modelRoot = gltf.scene;
+      modelRoot.traverse(obj => {
+        if (obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+          // ensure standard material has emissive we can tweak
+          if (obj.material && obj.material.isMeshStandardMaterial) {
+            obj.material.emissive ??= new THREE.Color(0x000000);
+          }
+          pickable.push(obj);
+        }
+      });
+      scene.add(modelRoot);
+      console.log('Model loaded!');
+    },
+    (xhr) => console.log(`Loading ${(xhr.loaded / xhr.total * 100).toFixed(0)}%`),
+    (err) => console.error('Error loading model:', err)
+  );
+
+  // --- Raycasting (hover highlight + click action) ---
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let hovered = null;
+
+  function onPointerMove(e){
+    mouse.x = (e.clientX / innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / innerHeight) * 2 + 1;
+  }
+  addEventListener('pointermove', onPointerMove);
+
+  function onClick(){
+    if (!pickable.length) return;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(pickable, false);
+    if (hits.length){
+      const mesh = hits[0].object;
+      // Click action: toggle wireframe on the clicked mesh
+      const mat = mesh.material;
+      if ('wireframe' in mat) mat.wireframe = !mat.wireframe;
+    }
+  }
+  addEventListener('click', onClick);
+
+  // --- Animation / hover logic ---
+  const state = {
+    spin: true,
+    lightIntensity: 1.0,
+    wireframeAll: false
+  };
+
+  const clock = new THREE.Clock();
+  function tick(){
+    const t = clock.getElapsedTime();
+
+    // gentle spin for presentation
+    if (modelRoot && state.spin){
+      modelRoot.rotation.y = t * 0.4;
+    }
+
+    // hover highlight using emissive
+    if (pickable.length){
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(pickable, false);
+      const newHover = hits.length ? hits[0].object : null;
+
+      if (hovered && hovered !== newHover && hovered.material?.emissive){
+        hovered.material.emissive.set(0x000000); // clear previous
+      }
+      if (newHover && newHover.material?.emissive){
+        newHover.material.emissive.set(0x222222); // subtle glow
+      }
+      hovered = newHover;
+    }
+
+    // live updates
+    sun.intensity = state.lightIntensity;
+
+    if (state.wireframeAll && pickable.length){
+      pickable.forEach(m => { if ('wireframe' in m.material) m.material.wireframe = true; });
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // --- Tiny GUI controls ---
+  const gui = new GUI();
+  gui.add(state, 'spin').name('Auto Spin');
+  gui.add(state, 'wireframeAll').name('Wireframe All');
+  gui.add(state, 'lightIntensity', 0, 2, 0.01).name('Sun Intensity');
+
+  // --- Resize handling ---
+  addEventListener('resize', () => {
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+</script>
+</body>
+</html>

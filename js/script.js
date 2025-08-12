@@ -27,6 +27,43 @@ let userVX = 0, userVY = 0;
 let lastMouseTime = performance.now();
 
 
+const video = document.getElementById("bg-video");
+video.loop = true; // <-- Add this line to make the video loop
+video.pause();
+video.currentTime = 0;
+video.play(); // <-- Play automatically
+
+let targetTime = 0;
+let seeking = false;
+
+// Listen for seek events to avoid flooding the player
+// video.addEventListener("seeking", () => (seeking = true));
+// video.addEventListener("seeked", () => (seeking = false));
+
+// video.addEventListener("loadedmetadata", () => {
+//     const maxScroll = document.body.scrollHeight - window.innerHeight;
+
+//     // Update target video time based on scroll position
+//     window.addEventListener("scroll", () => {
+//     const scrollTop = window.scrollY;
+//     const scrollFraction = scrollTop / maxScroll;
+//     targetTime = scrollFraction * video.duration;
+//     });
+
+//     // Animation loop using requestAnimationFrame
+//     function animate() {
+//     if (!seeking) {
+//         video.currentTime = targetTime;
+//     }
+//     requestAnimationFrame(animate);
+//     }
+
+//     animate(); // Start the loop
+// });
+
+// ...existing code...
+
+
 window.addEventListener('scroll', () => {
   const scrollTop = window.scrollY;
   const docHeight = document.body.scrollHeight - window.innerHeight;
@@ -292,16 +329,16 @@ window.addEventListener('scroll', () => {
 
 // 6) tsParticles config (unchanged)
 const particlesConfig = {
-  particles: {
-    number: { value: 15, density: { enable: true, area: 800 } },
-    color: { value: '#ececec' },
-    shape: { type: 'circle' },
-    shadow: { enable: true, blur: 8, color: { value: '#ececec' } },
-    size: { value: { min: 1, max: 4 }, animation: { enable: true, speed: 1.5, minimumValue: 1, sync: false } },
-    twinkle: { particles: { enable: true, frequency: 0.05, opacity: 0.6 } },
-    opacity: { value: 0.3, animation: { enable: true, speed: 0.5, minimumValue: 0.1, sync: false } },
-    move: { enable: true, speed: 0.5, outModes: 'bounce', direction: 'none' }
-  },
+  // particles: {
+  //   number: { value: 15, density: { enable: true, area: 800 } },
+  //   color: { value: '#ececec' },
+  //   shape: { type: 'circle' },
+  //   shadow: { enable: true, blur: 8, color: { value: '#ececec' } },
+  //   size: { value: { min: 1, max: 4 }, animation: { enable: true, speed: 1.5, minimumValue: 1, sync: false } },
+  //   twinkle: { particles: { enable: true, frequency: 0.05, opacity: 0.6 } },
+  //   opacity: { value: 0.3, animation: { enable: true, speed: 0.5, minimumValue: 0.1, sync: false } },
+  //   move: { enable: true, speed: 0.5, outModes: 'bounce', direction: 'none' }
+  // },
   interactivity: {
     events: { onHover: { enable: true, mode: 'repulse' }, resize: true },
     modes: { repulse: { distance: 100, duration: 0.4 } }
@@ -316,24 +353,24 @@ tsParticles.load('particles', particlesConfig).then(container => {
 });
 
 // 8) Scroll-based tweaks (unchanged)
-let lastScrollY = window.scrollY || window.pageYOffset;
-window.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY || window.pageYOffset;
-  const dir = currentScrollY > lastScrollY ? 'top' :
-              currentScrollY < lastScrollY ? 'bottom' : 'none';
-  lastScrollY = currentScrollY;
+// let lastScrollY = window.scrollY || window.pageYOffset;
+// window.addEventListener('scroll', () => {
+//   const currentScrollY = window.scrollY || window.pageYOffset;
+//   const dir = currentScrollY > lastScrollY ? 'top' :
+//               currentScrollY < lastScrollY ? 'bottom' : 'none';
+//   lastScrollY = currentScrollY;
 
-  const p = tsParticles.domItem(0);
-  if (!p) return;
-  if (dir === 'top' || dir === 'bottom') {
-    p.options.particles.move.direction = dir;
-    p.options.particles.move.speed     = 3;
-  } else {
-    p.options.particles.move.direction = 'none';
-    p.options.particles.move.speed     = 0.5;
-  }
-  p.refresh();
-});
+//   const p = tsParticles.domItem(0);
+//   if (!p) return;
+//   if (dir === 'top' || dir === 'bottom') {
+//     p.options.particles.move.direction = dir;
+//     p.options.particles.move.speed     = 3;
+//   } else {
+//     p.options.particles.move.direction = 'none';
+//     p.options.particles.move.speed     = 0.5;
+//   }
+//   p.refresh();
+// });
 
 const ubInner = ub.querySelector('.user-ball-inner');
 
@@ -412,56 +449,4 @@ document.addEventListener('DOMContentLoaded', () => {
         filter: 'blur(5px)', // Blurs out
         ease: 'power2.inOut', // Easing function for a smooth effect
     });
-
-    
 });
-
- // Register the ScrollTrigger plugin with GSAP
-        gsap.registerPlugin(ScrollTrigger);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const curvedGrid = document.querySelector('.curved-grid');
-            const numberOfStrips = 40; // More strips make a smoother curve
-            const stripWidthVW = 5; // Width of each strip in vw units
-            const totalWidthVW = numberOfStrips * stripWidthVW;
-
-            // Create and position the grid strips
-            for (let i = 0; i < numberOfStrips; i++) {
-                const strip = document.createElement('div');
-                strip.className = 'grid-strip';
-                strip.style.width = `${stripWidthVW}vw`;
-                
-                // Calculate position and rotation for each strip to form a curve
-                const angle = (i / (numberOfStrips - 1) - 0.5) * 100; // Total curve angle
-                const radius = 350; // Radius of the curve in pixels
-                
-                // Position strips from left to right
-                const leftPosition = (i * stripWidthVW) - ((totalWidthVW - 100) / 2);
-                
-                strip.style.left = `${leftPosition}vw`;
-                
-                // Apply 3D transform to create the curve
-                // We rotate each strip on its Y-axis and push it back in Z-space
-                strip.style.transform = `rotateY(${angle}deg) translateZ(-${radius}px)`;
-                
-                // Adjust background position for each strip to make the grid seamless
-                strip.style.backgroundPositionX = `${-i * 60 * (stripWidthVW / 5)}px`;
-
-                curvedGrid.appendChild(strip);
-            }
-
-            // Set an initial state for the grid container
-            gsap.set(".curved-grid", { y: -150 });
-
-            // Create the scroll-triggered animation for the entire curved grid
-            gsap.to(".curved-grid", {
-                scrollTrigger: {
-                    trigger: "body",
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 1.5,
-                },
-                y: 150, // Move the entire curved grid on the Y-axis
-                ease: "power1.inOut"
-            });
-        });

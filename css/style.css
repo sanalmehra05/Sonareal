@@ -32,51 +32,6 @@
 }
 
 
-.grid-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Place it behind the content */
-            perspective: 1000px; /* The perspective from which we view the 3D scene */
-        }
-
-        /* The container for all the grid strips, which will be rotated as a whole */
-        .curved-grid {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d; /* This is crucial for nesting 3D elements */
-            transform: rotateX(60deg); /* Tilts the entire curved grid back */
-            will-change: transform;
-        }
-
-        /* Individual vertical strips that form the curved surface */
-        .grid-strip {
-            position: absolute;
-            top: -75vh; /* Position strips to fill the view vertically */
-            height: 250vh;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-            background-size: 60px 60px;
-            transform-origin: center center; /* Rotate strips around their own center */
-            will-change: transform;
-        }
-
-        /* The content that will appear over the grid */
-        .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Make content section take full viewport height */
-            text-align: center;
-            padding: 2rem;
-        }
         
 /*───────────────────────────────────────────────────────────
   BODY & BACKGROUND STYLES
@@ -141,6 +96,23 @@ body::before {
   padding: 0 3rem;
   z-index: 100;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#video-container {
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 
 /* Logo */
@@ -212,6 +184,7 @@ body::before {
   background: radial-gradient(ellipse 66.90% 355.10% at 50.00% 50.00%, #D07BF2 0%, #66B4F3 100%); border-radius: 70px
 }
 
+
 /* Mobile Menu Toggle */
 .hamburger {
   display: none;
@@ -246,7 +219,7 @@ body::before {
   width: 100%;
   height: 100%;
 }
-
+/* 
 .anime-character-wrapper {
   display: flex;
   justify-content: center;
@@ -254,7 +227,7 @@ body::before {
   position: absolute;
   right: 50px;
   z-index: 1;
-}
+} */
 
 /* Eye white */
 /* .eye {
@@ -652,12 +625,33 @@ section {
 
 .bundle-card {
   background: var(--card-bg);
-  padding: 2rem;
+  width: 30%;
   border-radius: 15px;
   transition: var(--transition);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: var(--transition);
 }
+
+.starter{
+  background-color: #1C1F28;
+  border: 2px solid #94B5B8;
+}
+
+.basic{
+  background-color: #1E1C28;
+  border: 2px solid #C590B7;
+}
+
+.enhanced{
+  background-color: #1C1B2E;
+  border: 2px solid #817AB0;
+}
+
+.premium{
+  background-color: #222025;
+  border: 2px solid #D2B899;
+}
+
 
 
 .bundle-card:hover {
@@ -665,18 +659,34 @@ section {
   box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 30px rgba(102, 180, 243, 0.3);
 }
 
-.bundle-card h3 {
-  color: var(--accent-color);
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
 
 .bundle-card ul {
   list-style: none;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: left;
+  padding: 1.5rem;
+  height: 60%;
   color: rgba(255, 255, 255, 0.85);
   font-size: 1rem;
   line-height: 1.6;
+}
+
+.starter ul{
+  background-color: #1E2A33;
+}
+
+.basic ul{
+  background-color: #2B1F32;
+}
+
+.enhanced ul{
+  background-color: #222039;
+}
+
+.premium ul{
+  background-color: #2D2A2C;
 }
 
 .bundle-card li::before {
@@ -690,6 +700,50 @@ section {
   color: var(--secondary-color);
 }
 
+
+.card-heading{
+  font-size: 1.5rem;
+  padding-bottom: 0.5rem;
+  padding: 1.5rem;
+  line-height: 1;
+}
+
+.card-pricing{
+  font-size: 1.8rem;
+}
+
+.plan-container{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin-top: 10px;
+  padding: 1.5rem;
+}
+
+.plan{
+  font-size: 15px;
+  padding: 0.8rem 1.5rem;
+  margin-bottom: 3rem;
+}
+
+
+.starter a{
+  background-color: #A1D4CE;
+}
+
+.basic a{
+  background-color: #E296C6;
+}
+
+.enhanced a{
+  background-color: #9185C7;
+}
+
+.premium a{
+  background-color: #E8C698;
+}
+
+
 .sub-section-title {
   text-align: center;
   font-size: 1.8rem;
@@ -701,8 +755,9 @@ section {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(3px);
   border-radius: 16px;
   box-shadow: 0 0 20px rgba(102, 180, 243, 0.15);
 }
@@ -762,7 +817,6 @@ section {
   box-shadow: 0 0 15px rgba(102, 180, 243, 0.25);
   transition: transform 0.5s ease;
 }
-
 
 
 .bundle-card {
