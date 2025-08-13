@@ -2,7 +2,6 @@
 // ────────────────────────────────────────────────────────────
 // Enhanced physics: elastic collision + cursor-speed impulse
 
-
 // 1) Grab the interactive area & balls
 const area = document.querySelector('.interactive-area');
 const bb   = document.querySelector('.bouncing-ball');
