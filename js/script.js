@@ -424,6 +424,11 @@ document.getElementById('go-crazy-btn').addEventListener('click', () => {
 
 window.dispatchEvent(new Event('scroll'));
 
+/* =======================
+   HERO ANIMATION DISABLED
+   (GSAP + ScrollTrigger)
+==========================
+
 document.addEventListener('DOMContentLoaded', () => {
     // Register the plugin
     gsap.registerPlugin(ScrollTrigger);
@@ -449,3 +454,4 @@ document.addEventListener('DOMContentLoaded', () => {
         ease: 'power2.inOut', // Easing function for a smooth effect
     });
 });
+*/
