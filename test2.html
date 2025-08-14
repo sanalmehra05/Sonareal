@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corner Glow Effect</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #0c0c14; /* dark background so glow stands out */
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Generic glow style */
+  .corner-glow {
+    position: absolute;
+    width: 300px;       /* size of glow circle */
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(166, 89, 255, 0.7) 0%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+  }
+
+  /* Top left corner */
+  .corner-glow.left {
+    top: -150px;  /* move up so center is in corner */
+    left: -150px;
+  }
+
+  /* Top right corner */
+  .corner-glow.right {
+    top: -150px;
+    right: -150px;
+  }
+
+  /* Optional pulse animation */
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .corner-glow {
+    animation: pulse 4s infinite ease-in-out;
+  }
+</style>
+</head>
+<body>
+  <div class="corner-glow left"></div>
+  <div class="corner-glow right"></div>
+</body>
+</html>

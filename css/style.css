@@ -5,6 +5,14 @@
 @import url(https://db.onlinewebfonts.com/c/2d57f676e3d6955778fb8acac0176b9a?family=Eina01-Bold);
 @import url(https://db.onlinewebfonts.com/c/1868e326d3ee28e5395f6efa2bc037bf?family=Eina01-Regular);
 @import url(https://fonts.cdnfonts.com/css/coolvetica-2); 
+@import url(https://db.onlinewebfonts.com/c/e37c5bb24acd803973c692c8c59a6230?family=Benzin-Bold);
+
+
+@font-face {
+  font-family: 'Benzin-Semibold'; 
+  src: url('../assets/fonts/Benzin-Semibold.ttf') format('truetype'); 
+  font-weight: bold;
+}
 
 /* Modern Cyber Theme Variables */
 :root {
@@ -30,8 +38,6 @@
   box-sizing: border-box;
   cursor: none
 }
-
-
 
      
 /*───────────────────────────────────────────────────────────
@@ -67,6 +73,38 @@ body::before {
   z-index: -2;
   pointer-events: none;
 }
+
+.corner-glow {
+    position: absolute;
+    width: 300px;       /* size of glow circle */
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(166, 89, 255, 0.7) 0%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+  }
+
+  /* Top left corner */
+  .corner-glow.left {
+    top: -150px;  /* move up so center is in corner */
+    left: -150px;
+  }
+
+  /* Top right corner */
+  .corner-glow.right {
+    top: -150px;
+    right: -150px;
+  }
+
+  /* Optional pulse animation */
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .corner-glow {
+    animation: pulse 4s infinite ease-in-out;
+  }
 
 /*───────────────────────────────────────────────────────────
   NAVIGATION BAR
@@ -134,7 +172,48 @@ video {
   writing-mode: vertical-rl;
   text-orientation: mixed;
   margin-right: 2rem;
+  font-family: Benzin-Bold;
 }
+
+.v-line{
+  position: absolute;
+  left: 7.5px;                      /* flush to the hero’s left edge */
+  top: 0;
+  transform-origin: left center;/* rotate around the left edge */
+  transform: translateY(-50%) rotate(90deg);
+  width: 65vh;                  /* your line length */
+  color: rgba(255,255,255,0.2);
+  display: flex;                /* keep your flex layout if needed */
+  flex-direction: row;
+}
+
+
+
+.v-line::before,
+.v-line::after{
+  position: relative;
+  top: 7.5px;
+}
+
+.v-line-right {
+  position: absolute;
+  right: 7.5px; 
+  top: 100%;
+  transform-origin: right center;
+  transform: translateY(-50%) rotate(90deg);
+  width: 65vh;
+  color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+
+.v-line-right::before,
+.v-line-right::after {
+  position: relative;
+  bottom: 7.5px;
+}
+
 
 .nav-menu{
   position: relative;
@@ -155,12 +234,11 @@ video {
   word-wrap: break-word;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   padding-left: 1rem;
-  transition: var(--transition);
+  transition: 0.5s;
 }
 
 .nav-content .logo:hover {
-  text-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
-  transform: translateY(-2px);
+  text-shadow: 0 0 10px #834bca, 0 0 30px #834bca;
 }
 
 /* Navigation Menu */
@@ -170,6 +248,7 @@ video {
   align-items: start;
   display: flex;
   gap: 2.5rem;
+  margin: 0px 15px;
 }
 
 
@@ -242,11 +321,48 @@ video {
 .hero {
   position: relative;
   width: 100%;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: calc(15vh + var(--nav-height));
-  height: calc(100vh - var(--nav-height));
+  padding: 0;
+  padding-left: 2rem;
+  height: 65vh;
 }
+
+
+.waveform-rotated {
+  position: absolute;
+  height: 55px;
+  display: flex;
+  gap: 3px;
+  transform: rotate(90deg);
+  transform-origin: center;
+  width: fit-content;
+}
+
+.wave-bar {
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  transition: height 0.4s ease-in-out;
+}
+
+.wave-1{
+  top: 3px;
+  left: 0;
+  align-items: flex-end;
+}
+.wave-2{
+  bottom: 3px;
+  left: 0;
+  align-items: flex-end;
+}
+.wave-3{
+  top: 3px;
+  right: 0;
+}
+.wave-4{
+  bottom: 3px;
+  right: 0;
+}
+
 
 .r1-box{
   position: absolute;
@@ -261,17 +377,17 @@ video {
 
 .dream{
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 1rem;
 }
-
-.heading-text{
-  line-height: 10rem;
+.heading-text {
   height: fit-content;
 }
 
 .heading-text div{
-  font-size: 10rem;
+  font-size: 9vh;
+  font-family: "Benzin-Bold" !important;
+  filter: drop-shadow(2px 5px 0px #834bca);
 }
+
 .interactive-area {
   position: relative;
   width: 100%;
@@ -364,12 +480,12 @@ video {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: var(--primary-color);
+  background: #834bca;
   mix-blend-mode: screen;
   box-shadow:
-    0 0 5px var(--primary-color),
-    0 0 5px var(--primary-color),
-    0 0 5px var(--primary-color);
+    0 0 5px #834bca,
+    0 0 5px #834bca,
+    0 0 5px #834bca;
   /* ensure it's on top of the outer layer */
   position: relative;
 }
@@ -402,10 +518,12 @@ video {
   HERO CONTENT
 ───────────────────────────────────────────────────────────*/
 .hero-content {
+  height: 100%;
+  position: relative;
   display: flex;
   justify-content: start;
+  align-items: center;
   width:80%;
-  gap: 100px;
 }
 
 
@@ -420,7 +538,6 @@ video {
   word-wrap: break-word;
 }
 
-
 .hero-bottom{
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -429,7 +546,8 @@ video {
 h4 {
   display: flex;
   flex-direction: row;
-  color: rgba(255, 255, 255, 0.2)
+  color: rgba(255, 255, 255, 0.2);
+  margin: 0;
 }
 
 .top-line{
@@ -470,6 +588,23 @@ h4:after {
 
 .hero-bottom-third {
   width: 100%;
+}
+
+.outer-line-confirm {
+  width: 160px;
+  height: 60px;
+  padding-top: 5px;
+  padding-left: 4px;
+  border: 1px solid #854acd;
+  border-radius: 40px;
+}
+
+.btn-confirm {
+  display: flex;
+  justify-content: center;
+  width: 150px;
+  border-radius: 40px;
+  filter: drop-shadow(0px 0px 20px #834bca);
 }
 
 .subheading {

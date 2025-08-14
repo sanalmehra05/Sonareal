@@ -455,3 +455,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 */
+
+const bars = document.querySelectorAll('.wave-bar');
+
+    function randomizeHeights() {
+      bars.forEach(bar => {
+        const newHeight = Math.floor(Math.random() * 100) +10; // between 20% and 100%
+        bar.style.height = newHeight + '%';
+      });
+    }
+
+    // Set initial random heights
+    randomizeHeights();
+
+    // Randomize heights every 250ms
+    setInterval(randomizeHeights, 250);
