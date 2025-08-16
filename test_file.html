@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Studio | About Us</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', 'Courier New', monospace;
+        }
+
+        body {
+            background: #050510;
+            color: #e0e0ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 80, 120, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 80, 120, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Grid overlay */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(0, 150, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 150, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 #00ffff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(32px, 9999px, 78px, 0); }
+            5% { clip: rect(65px, 9999px, 53px, 0); }
+            10% { clip: rect(52px, 9999px, 99px, 0); }
+            15% { clip: rect(88px, 9999px, 98px, 0); }
+            20% { clip: rect(42px, 9999px, 33px, 0); }
+            25% { clip: rect(20px, 9999px, 80px, 0); }
+            30% { clip: rect(25px, 9999px, 30px, 0); }
+            35% { clip: rect(97px, 9999px, 85px, 0); }
+            40% { clip: rect(11px, 9999px, 46px, 0); }
+            45% { clip: rect(76px, 9999px, 41px, 0); }
+            50% { clip: rect(21px, 9999px, 12px, 0); }
+            55% { clip: rect(83px, 9999px, 29px, 0); }
+            60% { clip: rect(79px, 9999px, 70px, 0); }
+            65% { clip: rect(37px, 9999px, 24px, 0); }
+            70% { clip: rect(80px, 9999px, 5px, 0); }
+            75% { clip: rect(6px, 9999px, 79px, 0); }
+            80% { clip: rect(2px, 9999px, 100px, 0); }
+            85% { clip: rect(60px, 9999px, 88px, 0); }
+            90% { clip: rect(99px, 9999px, 1px, 0); }
+            95% { clip: rect(34px, 9999px, 50px, 0); }
+            100% { clip: rect(90px, 9999px, 70px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 8px 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #ff00ff;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff00ff;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .hero-about {
+            text-align: center;
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            margin-bottom: 30px;
+            line-height: 1;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #aaa;
+            max-width: 700px;
+            margin: 0 auto 50px;
+            line-height: 1.6;
+        }
+
+        .hero-subtitle strong {
+            color: #ff00ff;
+            font-weight: 600;
+        }
+
+        .about-section {
+            padding: 80px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            color: #ff00ff;
+            text-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #777;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 100px;
+        }
+
+        .story-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .story-title {
+            font-size: 2.5rem;
+            color: #00ffff;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .story-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .story-text strong {
+            color: #ff00ff;
+            font-weight: 600;
+        }
+
+        .story-image {
+            position: relative;
+            background: rgba(10, 15, 30, 0.7);
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            overflow: hidden;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .matrix-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 16px;
+            line-height: 1.2;
+            color: rgba(0, 255, 150, 0.7);
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .matrix-char {
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-char:hover {
+            opacity: 1;
+            text-shadow: 0 0 10px rgba(0, 255, 150, 0.8);
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 100px;
+        }
+
+        .value-card {
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            border-radius: 5px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.3);
+            border-color: #00ffff;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            color: #ff00ff;
+            margin-bottom: 20px;
+        }
+
+        .value-title {
+            font-size: 1.8rem;
+            color: #00ffff;
+            margin-bottom: 15px;
+        }
+
+        .value-desc {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .team-section {
+            margin-bottom: 100px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .team-card {
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            border-radius: 5px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+            border-color: #ff00ff;
+        }
+
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff00ff, #bd00ff);
+        }
+
+        .team-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: linear-gradient(45deg, #bd00ff, #00ffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .team-name {
+            font-size: 1.5rem;
+            color: #ff00ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .team-role {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .team-desc {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .team-social a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(30, 30, 60, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .team-social a:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+            transform: translateY(-5px);
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 80px 0;
+            background: rgba(5, 10, 25, 0.8);
+            border-top: 1px solid #00ffff;
+            border-bottom: 1px solid #00ffff;
+            margin-bottom: 80px;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            color: #ff00ff;
+            text-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .cta-subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 50px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 50px;
+            background: transparent;
+            border: 2px solid #ff00ff;
+            color: #ff00ff;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .cta-button:hover {
+            color: #000;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: #ff00ff;
+            z-index: -1;
+            transition: width 0.4s ease;
+        }
+
+        .cta-button:hover::before {
+            width: 100%;
+        }
+
+        footer {
+            padding: 50px 0 30px;
+            text-align: center;
+            border-top: 1px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .footer-text {
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .social-links a {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(30, 30, 60, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            font-size: 1.4rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .social-links a:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 900px) {
+            .story-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-title {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            nav ul {
+                gap: 10px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Grid overlay -->
+    <div class="grid-overlay"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo glitch" data-text="CYBERSTUDIO">CYBERSTUDIO</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Projects</a></li>
+                    <li><a href="#" class="active">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero-about">
+            <h1 class="hero-title glitch" data-text="ABOUT US">ABOUT US</h1>
+            <p class="hero-subtitle">
+                We are <strong>CYBERSTUDIO</strong> - a collective of digital rebels creating immersive experiences at the intersection of technology and art.
+            </p>
+        </section>
+        
+        <!-- Story Section -->
+        <section class="about-section">
+            <div class="section-header">
+                <h2 class="section-title glitch" data-text="OUR STORY">OUR STORY</h2>
+                <p class="section-subtitle">From neon-lit beginnings to digital frontiers</p>
+            </div>
+            
+            <div class="story-grid">
+                <div class="story-content">
+                    <h3 class="story-title">ORIGINS IN THE DIGITAL UNDERGROUND</h3>
+                    <p class="story-text">
+                        Founded in the neon-drenched streets of Neo-Tokyo in 2023, CyberStudio emerged from the underground digital art scene. What began as a collective of hackers, artists, and dreamers quickly evolved into a powerhouse of cybernetic creativity.
+                    </p>
+                    <p class="story-text">
+                        <strong>Our mission</strong> is to push the boundaries of digital expression, blending cutting-edge technology with visionary artistry to create experiences that challenge perception and redefine reality.
+                    </p>
+                </div>
+                <div class="story-image">
+                    <div class="matrix-text" id="matrixText"></div>
+                </div>
+            </div>
+            
+            <!-- Values Section -->
+            <div class="section-header">
+                <h2 class="section-title glitch" data-text="OUR VALUES">OUR VALUES</h2>
+                <p class="section-subtitle">The core principles that drive our digital revolution</p>
+            </div>
+            
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="value-title">INNOVATION</h3>
+                    <p class="value-desc">
+                        We constantly explore emerging technologies and artistic frontiers, never settling for conventional solutions.
+                    </p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="value-title">TECHNICAL MASTERY</h3>
+                    <p class="value-desc">
+                        Our team combines deep technical expertise with creative vision to build immersive digital worlds.
+                    </p>
+                </div>
+                
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3 class="value-title">ARTISTIC INTEGRITY</h3>
+                    <p class="value-desc">
+                        We believe technology serves art - every project begins with a compelling artistic vision.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Team Section -->
+            <div class="section-header">
+                <h2 class="section-title glitch" data-text="THE CREW">THE CREW</h2>
+                <p class="section-subtitle">Digital architects of the new reality</p>
+            </div>
+            
+            <div class="team-section">
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <h3 class="team-name">KIRA NEXUS</h3>
+                        <div class="team-role">Lead Developer</div>
+                        <p class="team-desc">
+                            Code wizard and systems architect with a passion for pushing technological boundaries.
+                        </p>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-github"></i></a>
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h3 class="team-name">ZANE VECTOR</h3>
+                        <div class="team-role">Creative Director</div>
+                        <p class="team-desc">
+                            Visual architect who transforms digital dreams into breathtaking realities.
+                        </p>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-artstation"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-headphones"></i>
+                        </div>
+                        <h3 class="team-name">RAVEN SYNTH</h3>
+                        <div class="team-role">Sound Designer</div>
+                        <p class="team-desc">
+                            Creates immersive audio landscapes that transport audiences to other dimensions.
+                        </p>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-soundcloud"></i></a>
+                            <a href="#"><i class="fab fa-spotify"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="team-card">
+                        <div class="team-image">
+                            <i class="fas fa-vr-cardboard"></i>
+                        </div>
+                        <h3 class="team-name">JAX HOLO</h3>
+                        <div class="team-role">XR Specialist</div>
+                        <p class="team-desc">
+                            Blends physical and digital realities to create seamless immersive experiences.
+                        </p>
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-github"></i></a>
+                            <a href="#"><i class="fab fa-linkedin"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2 class="cta-title">JOIN THE DIGITAL REVOLUTION</h2>
+            <p class="cta-subtitle">Ready to create something extraordinary together? Connect with our team to discuss your next cyber project.</p>
+            <a href="#" class="cta-button">INITIATE CONNECTION</a>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-artstation"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+            <p class="footer-text">&copy; 2023 CYBERSTUDIO. ALL RIGHTS RESERVED. UNAUTHORIZED ACCESS PROHIBITED.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create matrix effect for story section
+        function createMatrixEffect() {
+            const container = document.getElementById('matrixText');
+            const chars = "01010101010101010101010101010101";
+            const charCount = 500; // Number of characters to create
+            
+            for (let i = 0; i < charCount; i++) {
+                const char = document.createElement('span');
+                char.className = 'matrix-char';
+                char.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+                char.style.opacity = Math.random() * 0.5 + 0.1;
+                container.appendChild(char);
+            }
+            
+            // Animate random characters
+            setInterval(() => {
+                const matrixChars = container.querySelectorAll('.matrix-char');
+                const randomIndex = Math.floor(Math.random() * matrixChars.length);
+                
+                matrixChars[randomIndex].style.opacity = '1';
+                matrixChars[randomIndex].style.textShadow = '0 0 10px rgba(0, 255, 150, 0.8)';
+                
+                setTimeout(() => {
+                    matrixChars[randomIndex].style.opacity = Math.random() * 0.5 + 0.1;
+                    matrixChars[randomIndex].style.textShadow = 'none';
+                }, 1000);
+            }, 100);
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            createMatrixEffect();
+            
+            // Neon glow pulsation effect
+            setInterval(() => {
+                const intensity = 0.5 + Math.random() * 0.5;
+                document.querySelector('.hero-title').style.textShadow = `0 0 20px rgba(0, 255, 255, ${intensity})`;
+                
+                const intensity2 = 0.4 + Math.random() * 0.4;
+                document.querySelector('.section-title').style.textShadow = `0 0 15px rgba(255, 0, 255, ${intensity2})`;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

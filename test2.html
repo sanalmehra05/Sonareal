@@ -1,54 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Corner Glow Effect</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Joined 4-Card Cluster w/ Gradient Top Bar</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: #0c0c14; /* dark background so glow stands out */
-    position: relative;
-    overflow: hidden;
+  :root{
+    --bg:#0e1013;
+    --panel:#0f1116;
+    --text:#e9eef5;
+    --muted:#9aa4b2;
+
+    /* whole frame outer glow */
+    --cluster-a:#74f0ff;
+    --cluster-b:#d79cff;
+
+    /* per-card hues for the TOP BAR sweep */
+    --c1-a:#7cf1ff; --c1-b:#d89cff;    /* left → violet */
+    --c2-a:#8ae37a; --c2-b:#b0ff9a;    /* greens       */
+    --c3-a:#00e08a; --c3-b:#66ffcf;    /* mint → teal  */
+    --c4-a:#9ad0ff; --c4-b:#d59bff;    /* blue → violet*/
   }
 
-  /* Generic glow style */
-  .corner-glow {
-    position: absolute;
-    width: 300px;       /* size of glow circle */
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(166, 89, 255, 0.7) 0%, transparent 70%);
-    filter: blur(50px);
-    pointer-events: none;
+  *{ box-sizing:border-box }
+  html,body{ height:100% }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
   }
 
-  /* Top left corner */
-  .corner-glow.left {
-    top: -150px;  /* move up so center is in corner */
-    left: -150px;
+  .wrap{
+    min-height:100vh; display:grid; place-items:center;
+    padding:clamp(16px,4vw,48px);
   }
 
-  /* Top right corner */
-  .corner-glow.right {
-    top: -150px;
-    right: -150px;
+  /* OUTER joined frame */
+  .cluster{
+    width:min(1200px,96vw);
+    border-radius:22px;
+    padding:2px; /* border thickness */
+    background:linear-gradient(145deg,var(--cluster-a),var(--cluster-b)) border-box;
+    box-shadow:0 10px 30px rgba(0,0,0,.45),
+               0 0 36px color-mix(in oklab,var(--cluster-b) 38%,transparent);
   }
 
-  /* Optional pulse animation */
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
+  .cluster__inner{
+    position:relative;
+    background:
+      radial-gradient(100% 70% at 50% 0%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%),
+      var(--panel);
+    border-radius:20px;
+    overflow:hidden; /* clip children to rounded corners */
   }
 
-  .corner-glow {
-    animation: pulse 4s infinite ease-in-out;
+  /* ===== Gradient TOP BAR (the colorful line across the joint cards) ===== */
+  .cluster__inner::before{
+    content:"";
+    position:absolute; inset:0 0 auto 0; height:4px;
+    background:
+      linear-gradient(90deg,
+        var(--c1-a) 0%,
+        var(--c1-b) 18%,
+        var(--c2-a) 25%,
+        var(--c2-b) 48%,
+        var(--c3-a) 52%,
+        var(--c3-b) 74%,
+        var(--c4-a) 80%,
+        var(--c4-b) 100%);
+    filter: drop-shadow(0 0 10px rgba(180,150,255,.6))
+            drop-shadow(0 0 18px rgba(120,240,255,.35));
+    pointer-events:none;
+  }
+
+  /* subtle glow under the bar */
+  .cluster__inner::after{
+    content:"";
+    position:absolute; inset:0 0 auto 0; height:40px;
+    background:linear-gradient(180deg, rgba(180,160,255,.18), transparent 65%);
+    opacity:.35; pointer-events:none;
+  }
+
+  /* 4 cells, fused (no gaps) */
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+
+  /* internal separators */
+  .cell{ position:relative; }
+  .cell:not(:first-child)::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:1px;
+    background:linear-gradient(180deg, transparent, rgba(255,255,255,.22), transparent);
+    opacity:.6;
+  }
+
+  .card{
+    min-height:440px;
+    padding:clamp(18px,2.2vw,26px);
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+
+  .meta{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12px; color:var(--muted); letter-spacing:.02em; opacity:.95;
+  }
+  .chip{ padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); backdrop-filter:blur(6px); }
+
+  .art{
+    margin:clamp(18px,3vw,34px) 0;
+    height:220px; border-radius:14px;
+    background:
+      radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.06), transparent 70%),
+      linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    outline:1px dashed rgba(255,255,255,.08); outline-offset:-6px;
+  }
+
+  .title{ font-weight:800; font-size:clamp(18px,2vw,22px); letter-spacing:.01em; }
+  .subrow{ display:flex; align-items:center; gap:10px; color:var(--muted); margin-top:10px; }
+  .hairline{
+    height:1px; flex:1;
+    background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.25), rgba(255,255,255,.06));
+    border-radius:1px;
+  }
+
+  /* hover without breaking the fused look */
+  .cell:hover{ background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)); }
+  .cell:hover .art{ outline-color:rgba(255,255,255,.14); }
+
+  /* Responsive */
+  @media (max-width:1100px){
+    .grid{ grid-template-columns:repeat(2,1fr); }
+    .cell:nth-child(n+3)::after{
+      content:""; position:absolute; left:0; right:0; top:0; height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+      opacity:.6;
+    }
+  }
+  @media (max-width:560px){
+    .grid{ grid-template-columns:1fr; }
+    .cell::before, .cell::after{ display:none; }
+    .card{ min-height:360px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important }
   }
 </style>
 </head>
 <body>
-  <div class="corner-glow left"></div>
-  <div class="corner-glow right"></div>
+  <main class="wrap">
+    <section class="cluster" aria-label="Skills cluster">
+      <div class="cluster__inner">
+        <div class="grid">
+          <div class="cell">
+            <div class="card">
+              <div class="meta"><span>QL. Modules</span><span class="chip">Suite Core</span></div>
+              <div class="art" aria-hidden="true"></div>
+              <div><div class="title">Audio Skills</div><div class="subrow"><span>CA</span><div class="hairline"></div></div></div>
+            </div>
+          </div>
+
+          <div class="cell">
+            <div class="card">
+              <div class="meta"><span>EV. Modules</span><span class="chip">Proto Suite</span></div>
+              <div class="art" aria-hidden="true"></div>
+              <div><div class="title">3D Modeling Skills</div><div class="subrow"><span>SA</span><div class="hairline"></div></div></div>
+            </div>
+          </div>
+
+          <div class="cell">
+            <div class="card">
+              <div class="meta"><span>ED. Modules</span><span class="chip">Proto Suite</span></div>
+              <div class="art" aria-hidden="true"></div>
+              <div><div class="title">3D Prototyper</div><div class="subrow"><span>G7</span><div class="hairline"></div></div></div>
+            </div>
+          </div>
+
+          <div class="cell">
+            <div class="card">
+              <div class="meta"><span>Rt. Modules</span><span class="chip">Proto Suite</span></div>
+              <div class="art" aria-hidden="true"></div>
+              <div><div class="title">Programming</div><div class="subrow"><span>EA</span><div class="hairline"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>

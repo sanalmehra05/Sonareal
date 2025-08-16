@@ -10,14 +10,19 @@
 
 @font-face {
   font-family: 'Benzin-Regular'; 
-  src: url('../assets/fonts/Benzin-Regular.ttf') format('truetype'); 
+  src: url('../assets/fonts/Benzin-font/Benzin-Regular.ttf') format('truetype'); 
   font-weight: bold;
 }
 
 @font-face {
   font-family: 'Benzin-Semibold'; 
-  src: url('../assets/fonts/Benzin-Semibold.ttf') format('truetype'); 
+  src: url('../assets/fonts/Benzin-font/Benzin-Semibold.ttf') format('truetype'); 
   font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Benzin-Bold'; 
+  src: url('../assets/fonts/Benzin-font/Benzin-Bold.ttf') format('openfont');
 }
 
 /* Modern Cyber Theme Variables */
@@ -189,7 +194,7 @@ video {
   transform-origin: left center;/* rotate around the left edge */
   transform: translateY(-50%) rotate(90deg);
   width: 65vh;                  /* your line length */
-  color: #5e27d9;
+  color: #3b373f;
   display: flex;                /* keep your flex layout if needed */
   flex-direction: row;
 }
@@ -209,7 +214,7 @@ video {
   transform-origin: right center;
   transform: translateY(-50%) rotate(90deg);
   width: 65vh;
-  color: #5e27d9;
+  color: #3b373f;
   display: flex;
   flex-direction: row;
   margin: 0;
@@ -267,13 +272,13 @@ video {
 }
 
 .menu li a {
-  font-family: 'Eina01-Regular', sans-serif;
+  font-family: 'Benzin-Regular';
   color: var(--text-color);
   text-decoration: none;
   font-weight: 400;
   position: relative;
   padding: 0.5rem 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: var(--transition);
 }
 
@@ -348,7 +353,7 @@ video {
 
 .wave-bar {
   width: 2px;
-  background: #5e27d9;
+  background: #3b373f;
   border-radius: 2px;
   transition: height 0.4s ease-in-out;
 }
@@ -393,7 +398,7 @@ video {
 
 .heading-text div{
   font-size: 9vh;
-  font-family: "Benzin-Bold" !important;
+  font-family: 'Benzin-Bold' !important;
   filter: drop-shadow(2px 5px 0px #5e27d9);
 }
 
@@ -712,9 +717,8 @@ h4:after {
 .section-title {
   text-align: center;
   margin-bottom: 3rem;
-  font-family: 'Eina01-Bold';
+  font-family: 'Benzin-Semibold';
   font-size: 2.5rem;
-  letter-spacing: 2px;
   position: relative;
 }
 
@@ -724,10 +728,10 @@ h4:after {
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
+  width: 200px;
   height: 3px;
-  background: var(--primary-color);
-  box-shadow: var(--glow-primary);
+  background: #5e27d9;
+  box-shadow: 0 0 10px #7f5bcc !important;
 }
 
 section {
@@ -737,16 +741,51 @@ section {
 /*───────────────────────────────────────────────────────────
   ABOUT SECTION
 ───────────────────────────────────────────────────────────*/
+.corner-ring {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  pointer-events: none; /* ignore clicks */
+  z-index: 9999;
+  filter: drop-shadow(0 0 10px #5e27d9);
+}
+
+/* Spin animation */
+.corner-ring .spin {
+  animation: ring-spin 8s linear infinite;
+}
+
+/* Soft pulsing glow */
+.corner-ring svg {
+  animation: ring-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes ring-spin {
+  from { transform: rotate(0deg); transform-origin: 40px 40px; }
+  to   { transform: rotate(360deg); transform-origin: 40px 40px; }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.95; }
+  50%      { opacity: 0.75; }
+}
+
+
 .about{
   font-family: "Eina01-Regular";
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  min-height: 80vh;       /* adjust as needed */
+  overflow: hidden;       /* keeps the video clipped to this section */
+  isolation: isolate;
 }
 
 .about-content {
-  font-family: "Eina01-Regular";
-  max-width: 800px;
+  font-family: "Benzin-Regular";
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   line-height: 1.8;
 }
 
@@ -754,20 +793,83 @@ section {
   margin-bottom: 1.5rem;
 }
 
+/* Video fills only the about section */
+.about .video-container {
+  position: absolute;
+  inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+  z-index: 0;             /* behind content but within this section only */
+  overflow: hidden;
+}
+
+.about .video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0.1;           /* your dimming */
+}
+
+.dashes {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem; /* spacing between dashes */
+}
+
+.dash {
+  width: 20px;   /* dash length */
+  height: 3px;   /* dash thickness */
+  background: #5e27d9; /* light pink color */
+  filter: drop-shadow(0px 0px 5px #5e27d9);
+  border-radius: 3px;
+}
+
+.about-flex {
+  display: flex;
+  height: 80vh;
+  justify-content: space-around;
+  margin-top: 3rem;
+}
+
+.about-boxes{
+  width: 40vw;
+  height:  50vh;
+}
+
+.about-box-left{
+  background-color: #2b394b;
+}
+
+.about-box-right{
+
+  background-color: #382f3d;
+}
+
+.about-left-flex {
+  display: flex;
+  align-items: start;
+}
+
+.about-right-flex {
+  display: flex;
+  align-items: end;
+}
+
+
+
 /*───────────────────────────────────────────────────────────
   SKILLS SECTION
 ───────────────────────────────────────────────────────────*/
 .skills-grid {
   display: grid;
-  gap: 2.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  max-width: 1200px;
-  margin: 0 auto;
+  grid-template-columns:repeat(4,1fr); 
+  gap:0; 
 }
 
 .skill-card {
   background: var(--card-bg);
   padding: 2.5rem 1.5rem;
+  height: 50vh;
   border-radius: 15px;
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.1);
