@@ -25,6 +25,44 @@
   src: url('../assets/fonts/Benzin-font/Benzin-Bold.ttf') format('openfont');
 }
 
+.hero__right{
+      display:block;
+      width:50%;
+      height:100%;
+    }
+
+    /* Three.js canvas holder on the right */
+    #sphere-stage{
+      position:absolute;
+      inset: 0 0 0 0; /* fill right column */
+      contain: strict;
+      border-left:1px solid var(--grid);
+    }
+
+    /* Decorative subtle glow behind the sphere */
+    .sphere-glow{
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: radial-gradient(35% 35% at 70% 40%, rgba(183,154,255,0.20), transparent 60%);
+      filter: blur(26px);
+      opacity:.9;
+    }
+
+    /* Optional small label in top-right to match style */
+    .tag{
+      position:absolute; top:18px; right:22px;
+      padding:8px 14px; border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(183,154,255,0.22), rgba(107,76,255,0.18));
+      box-shadow: 0 0 36px rgba(183,154,255,0.25) inset, 0 0 22px rgba(183,154,255,0.25);
+      color:#120f19; font-weight:800; letter-spacing:.06em;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    /* Keep canvas crisp but not too heavy on HiDPI */
+    canvas{display:block; outline:none}
+
+
 /* Modern Cyber Theme Variables */
 :root {
   --bg-color: #1d1b1c;
@@ -864,15 +902,25 @@ section {
   display: grid;
   grid-template-columns:repeat(4,1fr); 
   gap:0; 
+  position: relative;
+  left: 15px;
 }
 
 .skill-card {
-  background: var(--card-bg);
+  background:
+    radial-gradient(60% 80% at 100% 0%,
+      #A087FF5C 0%,   /* 36% */
+      #A087FF1F 45%,  /* 12% */
+      transparent 70%),
+    radial-gradient(40% 60% at 0% 0%,
+      #C9B0FF2E 0%,   /* 18% */
+      #C9B0FF0F 40%,  /* 6%  */
+      transparent 70%),
+    #0F0F12; 
   padding: 2.5rem 1.5rem;
-  height: 50vh;
+  height: 60vh;
   border-radius: 15px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
@@ -901,17 +949,64 @@ section {
   transform: scaleX(1);
 }
 
-.skill-card h3 {
-  margin-bottom: 1rem;
-  color: var(--accent-color);
-  font-size: 1.8rem;
-  text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+.skill-heading{
+  display: flex;
+  justify-content: start;
+  align-items: center;
 }
 
-.skill-card p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 1.1rem;
+.art{
+  margin:clamp(18px,3vw,34px) 0;
+  height:220px; border-radius:14px;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.06), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+  outline:2px dashed rgba(255,255,255,.08); outline-offset:-6px;
 }
+
+.hairline{
+  height:1px; flex:1;
+  background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.25), rgba(255,255,255,.06));
+  border-radius:1px;
+  margin: 10px 0;
+}
+
+.skill-name{
+  text-align: left;
+  font-family: 'Benzin-Semibold';
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+.card1{
+  border: 2px solid #77bfbf;
+  border-right: 0px;
+  border-radius: 15px 0px 0px 15px;
+
+}
+
+.card2{
+  position: relative;
+  right: 10px;
+  border: 2px solid #9ccda8;
+  border-right: 0px;
+  border-radius: 15px 0px 0px 15px;
+}
+
+.card3{
+  position: relative;
+  right: 20px;
+  border: 2px solid #4ba4b9;
+  border-right: 0px;
+  border-radius: 15px 0px 0px 15px;
+}
+
+.card4{
+  position: relative;
+  right: 30px;
+  border: 2px solid #a87ccd;
+}
+
 
 /*───────────────────────────────────────────────────────────
   PROJECTS SECTION

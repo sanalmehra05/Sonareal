@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neon Cards • Limited Orbit</title>
+  <style>
+    html, body { height:100%; margin:0; background:#0b0c10; overflow:hidden; }
+    #info { position:fixed; left:12px; bottom:10px; color:#b8c0ff; font:12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; opacity:.7; user-select:none; }
+  </style>
+
+  <!-- Import map (as requested) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="info">Drag to orbit (±125°) • Scroll to zoom</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { Reflector } from 'three/addons/objects/Reflector.js';
+
+THREE.ColorManagement.enabled = true;
+
+/* ---------------- Renderer / Scene / Camera ---------------- */
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#0b0c10');
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(0, 2.4, 8.5);
+
+/* ---------------- Controls (limit to 250° total) ---------------- */
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 1.7, 0);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 4.5;
+controls.maxDistance = 14;
+
+// Azimuth (horizontal) clamp: -125° to +125° → total 250°; can't go behind
+controls.minAzimuthAngle = THREE.MathUtils.degToRad(-85);
+controls.maxAzimuthAngle = THREE.MathUtils.degToRad( 85);
+
+// Polar (vertical) clamp so you can't flip under or go top-down
+controls.minPolarAngle = THREE.MathUtils.degToRad(20);
+controls.maxPolarAngle = THREE.MathUtils.degToRad(85);
+
+/* ---------------- Lighting ---------------- */
+scene.add(new THREE.HemisphereLight(0x9ecbff, 0x101010, 0.6));
+const key = new THREE.DirectionalLight(0xffffff, 0.45);
+key.position.set(3, 6, 4);
+scene.add(key);
+
+/* ---------------- Reflective Floor + Neon Grid ---------------- */
+const floor = new THREE.Group(); scene.add(floor);
+
+const mirrorGeo = new THREE.PlaneGeometry(60, 60);
+const mirror = new Reflector(mirrorGeo, {
+  textureWidth: Math.floor(innerWidth * devicePixelRatio),
+  textureHeight: Math.floor(innerHeight * devicePixelRatio),
+  color: 0x121318,
+  clipBias: 0.003
+});
+mirror.rotateX(-Math.PI/2);
+floor.add(mirror);
+
+const grid1 = new THREE.GridHelper(60, 60, 0x6be6ff, 0x6be6ff);
+grid1.material.transparent = true; grid1.material.opacity = 0.16;
+grid1.position.y = 0.01; floor.add(grid1);
+
+const grid2 = new THREE.GridHelper(60, 60, 0xff86d1, 0xff86d1);
+grid2.material.transparent = true; grid2.material.opacity = 0.10;
+grid2.position.y = 0.012; floor.add(grid2);
+
+/* ---------------- Card border shader (glowing rounded rect) ---------------- */
+const cardVert = /* glsl */`
+  precision highp float;
+  varying vec2 vUv;
+  void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
+`;
+
+const cardFrag = /* glsl */`
+  precision highp float;
+  uniform vec3 edgeColor;
+  uniform vec3 fillColor;
+  uniform float radius;   // 0..0.5
+  uniform float border;   // thickness
+  uniform float feather;  // softness
+  varying vec2 vUv;
+
+  float sdRoundRect(vec2 uv, vec2 halfSize, float r){
+    vec2 p = uv - 0.5;
+    vec2 q = abs(p) - halfSize + vec2(r);
+    return length(max(q,0.0)) + min(max(q.x,q.y),0.0) - r;
+  }
+
+  void main(){
+    float sd = sdRoundRect(vUv, vec2(0.48,0.48), radius);
+    float inside = 1.0 - smoothstep(0.0, feather, sd);
+    float outline = smoothstep(border + feather, border, abs(sd));
+
+    vec3 edge = edgeColor * (1.6 + 2.0 * outline);
+    float sheen = smoothstep(0.2, 0.0, vUv.y) * 0.05;
+    vec3 base = fillColor + vec3(sheen);
+    vec3 col = mix(base, edge, outline);
+    col = mix(col, fillColor, 1.0 - inside);
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
+/* ---------------- Card content via CanvasTexture ---------------- */
+function drawCardCanvas({title, big, features, priceLeft, priceRight, btn, tint='#9af0ff'}) {
+  // match plane ratio ~ 3.7 / 2.1 = 1.7619
+  const W = 640, H = 1128; // 640 * 1.762 ≈ 1128
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+
+  // background (dark + soft inner glow)
+  ctx.fillStyle = '#0e0f14';
+  ctx.fillRect(0, 0, W, H);
+  const grd = ctx.createRadialGradient(W*0.5, H*0.2, 10, W*0.5, H*0.2, H*0.7);
+  grd.addColorStop(0, tint + '33'); // ~20% alpha
+  grd.addColorStop(1, '#00000000');
+  ctx.fillStyle = grd; ctx.fillRect(0, 0, W, H);
+
+  // top tiny chip
+  ctx.fillStyle = '#ffffff20';
+  roundRect(ctx, W-140, 34, 84, 26, 13); ctx.fill();
+
+  // title
+  ctx.fillStyle = '#bfc6ff';
+  ctx.font = '600 28px Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+  ctx.fillText(title, 34, 70);
+
+  // big number
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 120px Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+  ctx.fillText(big, 34, 220);
+
+  // features box
+  ctx.strokeStyle = '#ffffff26';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 26, 260, W-52, 300, 16); ctx.stroke();
+  ctx.font = '500 26px Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial';
+  features.forEach((f, i) => {
+    ctx.fillStyle = '#a8b0c4';
+    ctx.fillText(f, 46, 310 + i*48);
+    // right red accent number (fake)
+    ctx.fillStyle = '#ff85a7';
+    ctx.fillText(Math.round(10+Math.random()*90).toString(), W-90, 310 + i*48);
+  });
+
+  // bottom prices
+  ctx.fillStyle = '#bfc6ff';
+  ctx.font = '600 28px Inter, system-ui, -apple-system';
+  ctx.fillText(priceLeft, 34, H-150);
+  ctx.fillText(priceRight, W-120, H-150);
+
+  // button
+  const btnW = W-160, btnH = 62, btnX = 80, btnY = H-120;
+  const g2 = ctx.createLinearGradient(btnX, btnY, btnX, btnY+btnH);
+  g2.addColorStop(0, '#E7D6FF');
+  g2.addColorStop(1, '#7B5CFF');
+  ctx.fillStyle = g2;
+  roundRect(ctx, btnX, btnY, btnW, btnH, 32); ctx.fill();
+
+  ctx.fillStyle = '#281b50';
+  ctx.font = '800 26px Inter, system-ui, -apple-system';
+  const labelW = ctx.measureText(btn).width;
+  ctx.fillText(btn, btnX + (btnW - labelW)/2, btnY + btnH/2 + 9);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr, y);
+  ctx.arcTo(x+w, y,   x+w, y+h, rr);
+  ctx.arcTo(x+w, y+h, x,   y+h, rr);
+  ctx.arcTo(x,   y+h, x,   y,   rr);
+  ctx.arcTo(x,   y,   x+w, y,   rr);
+  ctx.closePath();
+}
+
+/* ---------------- Build a card (border + content) ---------------- */
+function makeCard(edgeHex, contentOptions){
+  // Border plane (bloom-friendly)
+  const borderMat = new THREE.ShaderMaterial({
+    vertexShader: cardVert, fragmentShader: cardFrag,
+    uniforms: {
+      edgeColor: { value: new THREE.Color(edgeHex) },
+      fillColor: { value: new THREE.Color('#0e0f14') },
+      radius:    { value: 0.08 },
+      border:    { value: 0.02 },
+      feather:   { value: 0.003 }
+    },
+    transparent: false
+  });
+  const geo = new THREE.PlaneGeometry(2.1, 3.7);
+  const borderMesh = new THREE.Mesh(geo, borderMat);
+
+  // Content plane (slightly in front)
+  const tex = drawCardCanvas(contentOptions);
+  const contentMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+  const contentMesh = new THREE.Mesh(geo.clone(), contentMat);
+  contentMesh.position.z = 0.001;
+
+  const group = new THREE.Group();
+  group.add(borderMesh, contentMesh);
+  return group;
+}
+
+/* ---------------- Create deck of angled cards ---------------- */
+const colors = ['#9af0ff', '#d9a4ff', '#ff9bd2', '#ffb67e'];
+const titles = ['Pricing Plan', 'Pilot Plan', 'Pro Plan', 'Studio Plan'];
+const deck = new THREE.Group(); scene.add(deck);
+
+colors.forEach((c, i) => {
+  const card = makeCard(c, {
+    title: titles[i],
+    big: '550%',
+    features: ['Auto scenes', 'Finetune', 'Filters', 'Timing', 'Export'],
+    priceLeft: '$89',
+    priceRight: '$5.09',
+    btn: 'Choose Plan',
+    tint: c
+  });
+
+  // position across X, and angle each for a fan look
+  const spacing = 2.6;
+  const x = (i - 1.5) * spacing;
+  card.position.set(x, 1.8, 0);
+
+  // individual yaw (Y) and slight roll (Z) for style
+  const yaw = THREE.MathUtils.degToRad((-10) + i*6);  // -10°, -4°, +2°, +8°
+  const roll = THREE.MathUtils.degToRad((i-1.5)*1.5); // subtle tilt
+  card.rotation.set(THREE.MathUtils.degToRad(-2), yaw, roll);
+
+  deck.add(card);
+});
+
+// tilt whole deck for a showroom angle
+deck.rotation.x = THREE.MathUtils.degToRad(-8);
+deck.rotation.y = THREE.MathUtils.degToRad(-6);
+
+/* ---------------- Rim lights to match each card ---------------- */
+const rimColors = [0x92ffff, 0xd9a4ff, 0xff9bd2, 0xffb67e];
+[-3.9, -1.3, 1.3, 3.9].forEach((x, i) => {
+  const p = new THREE.PointLight(rimColors[i], 2.0, 6, 2);
+  p.position.set(x, 2.2, 2.0);
+  scene.add(p);
+});
+
+/* ---------------- Postprocessing: bloom ---------------- */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 1.1, 0.4, 0.2);
+bloom.threshold = 0.0; bloom.strength = 1.08; bloom.radius = 0.55;
+composer.addPass(bloom);
+
+/* ---------------- Resize ---------------- */
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  mirror.getRenderTarget().setSize(
+    Math.floor(innerWidth * devicePixelRatio),
+    Math.floor(innerHeight * devicePixelRatio)
+  );
+}, { passive:true });
+
+/* ---------------- Animate ---------------- */
+renderer.setAnimationLoop(() => {
+  controls.update();
+  deck.position.y = 0.03 * Math.sin(performance.now()*0.0016); // gentle float
+  composer.render();
+});
+</script>
+</body>
+</html>

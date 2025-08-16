@@ -141,7 +141,10 @@
           <div class="create">CREATE</div>
         </div>
       </div>
-      
+      <div class="hero__right">
+        <div id="sphere-stage"></div>
+        <div class="sphere-glow" aria-hidden="true"></div>
+      </div>
   </section>
 
   <div class="hero-bottom">
@@ -228,21 +231,33 @@
     <h2 class="section-title">Skills</h2>
     <div class="skills-grid">
       <div class="skill-card card1">
-        <h3>Development & Tech</h3>
-        <p>Web Development: Interactive websites, landing pages, and music showcase platforms.</p>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="art" aria-hidden="true"></div>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="hairline"></div>
+        <div class="skill-name">Web Developement</div>
       </div>
       <div class="skill-card card2">
-        <h3>Frontend</h3>
-        <p>Modern JavaScript, React, Vue, responsive design, and cutting-edge CSS animations and effects.</p>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="art" aria-hidden="true"></div>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="hairline"></div>
+        <div class="skill-name">UI/UX Design</div>
       </div>
       <div class="skill-card card3">
-        <h3>UI/UX Design</h3>
-        <p>User-centered design, interaction design, prototyping, and creating intuitive user experiences.</p>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="art" aria-hidden="true"></div>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="hairline"></div>
+        <div class="skill-name">Music Production</div>
       </div>
       <div class="skill-card card4">
-        <h3>Motion Design</h3>
-        <p>Advanced CSS animations, SVG animations, WebGL transitions, and interactive storytelling.</p>
-      </div>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="art" aria-hidden="true"></div>
+        <div class="skill-heading">Asaddsa</div>
+        <div class="hairline"></div>
+        <div class="skill-name">Programming</div>
+      </div>   
     </div>
   </section>
 
@@ -388,7 +403,145 @@
       <a href="#">𝔾</a>
     </div>
   </footer>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+    // Colors derived from page scheme
+    const COLORS = {
+      bg: 0x0b0a0e,
+      wire: 0xb79aff,   // lavender
+      fill: 0x6b4cff    // deeper purple
+    };
+
+    const stage = document.getElementById('sphere-stage');
+
+    // Scene & renderer
+    const scene = new THREE.Scene();
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setClearAlpha(0); // transparent over CSS background
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    stage.appendChild(renderer.domElement);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0.6, 6.2);
+
+    // Resize handler to fit the right column
+    function onResize(){
+      const { width, height } = stage.getBoundingClientRect();
+      renderer.setSize(width, height, false);
+      camera.aspect = width / Math.max(height, 1);
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(onResize).observe(stage);
+
+    // Group container to rotate smoothly
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // Geometry
+    const radius = 2.2;
+    const geo = new THREE.SphereGeometry(radius, 16, 16);
+
+    // Slight translucent solid so lights are visible
+    const solid = new THREE.Mesh(
+      geo,
+      new THREE.MeshStandardMaterial({
+        color: COLORS.fill,
+        roughness: 0.85,
+        metalness: 0.15,
+        transparent: true,
+        opacity: 0.12,
+        depthWrite: false
+      })
+    );
+    group.add(solid);
+
+    // Wireframe overlay
+    const wire = new THREE.Mesh(
+      geo,
+      new THREE.MeshStandardMaterial({
+        color: COLORS.wire,
+        wireframe: true,
+        metalness: 0.0,
+        roughness: 1.0
+      })
+    );
+    group.add(wire);
+
+    // Lights — two directional + soft ambient
+    const dir1 = new THREE.DirectionalLight(COLORS.wire, 1.8);
+    dir1.position.set(5, 6, 8);
+    scene.add(dir1);
+
+    const dir2 = new THREE.DirectionalLight(COLORS.fill, 1.1);
+    dir2.position.set(-6, -3, -4);
+    scene.add(dir2);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambient);
+
+    // Controls (mouse/touch)
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.rotateSpeed = 0.55;
+    controls.minDistance = 3.6;
+    controls.maxDistance = 8.5;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.35;
+    controls.target.set(0, 0, 0);
+
+    // Subtle parallax based on pointer to make it feel alive even without dragging
+    const pointer = new THREE.Vector2(0, 0);
+    let hovering = false;
+
+    function setPointer(e){
+      const r = stage.getBoundingClientRect();
+      const x = ( (e.clientX - r.left) / r.width ) * 2 - 1;
+      const y = ( (e.clientY - r.top) / r.height ) * 2 - 1;
+      pointer.set(x, y);
+    }
+
+    stage.addEventListener('pointermove', (e)=>{ setPointer(e); hovering = true; });
+    stage.addEventListener('pointerleave', ()=>{ hovering = false; });
+    stage.addEventListener('pointerdown', ()=>{ controls.autoRotate = false; });
+    stage.addEventListener('pointerup', ()=>{ controls.autoRotate = true; });
+
+    // Animate
+    const tmp = new THREE.Vector3();
+    function tick(){
+      // Gentle idle rotation
+      group.rotation.y += 0.0025;
+
+      // Parallax tilt toward the pointer
+      const targetRX = THREE.MathUtils.lerp(group.rotation.x, pointer.y * -0.25, 0.06);
+      const targetRY = THREE.MathUtils.lerp(group.rotation.y, group.rotation.y + pointer.x * 0.12, 0.05);
+      group.rotation.x = targetRX;
+      group.rotation.y = targetRY;
+
+      // Move key light a bit with pointer for more drama
+      dir1.position.lerp(tmp.set(5 + pointer.x * 2.5, 6 + pointer.y * 2.0, 8), 0.05);
+
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    onResize();
+    tick();
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>

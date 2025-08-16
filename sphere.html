@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hero • Wireframe Sphere (Three.js)</title>
+  <style>
+    :root{
+      /* Sonareal-ish palette from screenshot */
+      --bg:#0b0a0e;             /* near-black */
+      --fg:#e9e7ef;             /* light text */
+      --accent:#b79aff;         /* soft lavender */
+      --accent-2:#6b4cff;       /* deeper purple */
+      --grid:#1a1822;           /* subtle borders */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(55vw 55vw at 100% 0%, rgba(183,154,255,0.14), transparent 55%),
+        radial-gradient(60vw 60vw at 0% 0%, rgba(107,76,255,0.10), transparent 60%),
+        var(--bg);
+      color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      overflow-x:hidden;
+    }
+
+    /* Minimal hero layout */
+    .hero{
+      position:relative;
+      height:85vh; /* tall landing section */
+      border-bottom:1px solid var(--grid);
+      display:grid;
+      grid-template-columns: 1fr minmax(420px, 50vw); /* empty left, sphere right */
+      align-items:stretch;
+      padding-inline: clamp(16px, 3vw, 48px);
+    }
+
+    .hero__left{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      padding-left: clamp(8px, 2vw, 24px);
+    }
+    .hero__placeholder{opacity:.18; letter-spacing:.2em; font-weight:700}
+
+    .hero__right{
+      position:relative;
+      display:block;
+      width:100%;
+      height:100%;
+    }
+
+    /* Three.js canvas holder on the right */
+    #sphere-stage{
+      position:absolute;
+      inset: 0 0 0 0; /* fill right column */
+      contain: strict;
+      border-left:1px solid var(--grid);
+    }
+
+    /* Decorative subtle glow behind the sphere */
+    .sphere-glow{
+      position:absolute; inset:0;
+      pointer-events:none;
+      background: radial-gradient(35% 35% at 70% 40%, rgba(183,154,255,0.20), transparent 60%);
+      filter: blur(26px);
+      opacity:.9;
+    }
+
+    /* Optional small label in top-right to match style */
+    .tag{
+      position:absolute; top:18px; right:22px;
+      padding:8px 14px; border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(183,154,255,0.22), rgba(107,76,255,0.18));
+      box-shadow: 0 0 36px rgba(183,154,255,0.25) inset, 0 0 22px rgba(183,154,255,0.25);
+      color:#120f19; font-weight:800; letter-spacing:.06em;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    /* Keep canvas crisp but not too heavy on HiDPI */
+    canvas{display:block; outline:none}
+  </style>
+
+  <!-- Import map to match your prior setup style -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <section class="hero">
+    <div class="hero__left">
+      <!-- Intentionally blank per request. Keep the space for future copy. -->
+      <div class="hero__placeholder" aria-hidden="true"></div>
+    </div>
+    <div class="hero__right">
+      <div id="sphere-stage"></div>
+      <div class="sphere-glow" aria-hidden="true"></div>
+      <div class="tag">DREAM</div>
+    </div>
+  </section>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // Colors derived from page scheme
+    const COLORS = {
+      bg: 0x0b0a0e,
+      wire: 0xb79aff,   // lavender
+      fill: 0x6b4cff    // deeper purple
+    };
+
+    const stage = document.getElementById('sphere-stage');
+
+    // Scene & renderer
+    const scene = new THREE.Scene();
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setClearAlpha(0); // transparent over CSS background
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    stage.appendChild(renderer.domElement);
+
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0.6, 6.2);
+
+    // Resize handler to fit the right column
+    function onResize(){
+      const { width, height } = stage.getBoundingClientRect();
+      renderer.setSize(width, height, false);
+      camera.aspect = width / Math.max(height, 1);
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(onResize).observe(stage);
+
+    // Group container to rotate smoothly
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // Geometry
+    const radius = 2.2;
+    const geo = new THREE.SphereGeometry(radius, 16, 16);
+
+    // Slight translucent solid so lights are visible
+    const solid = new THREE.Mesh(
+      geo,
+      new THREE.MeshStandardMaterial({
+        color: COLORS.fill,
+        roughness: 0.85,
+        metalness: 0.15,
+        transparent: true,
+        opacity: 0.12,
+        depthWrite: false
+      })
+    );
+    group.add(solid);
+
+    // Wireframe overlay
+    const wire = new THREE.Mesh(
+      geo,
+      new THREE.MeshStandardMaterial({
+        color: COLORS.wire,
+        wireframe: true,
+        metalness: 0.0,
+        roughness: 1.0
+      })
+    );
+    group.add(wire);
+
+    // Lights — two directional + soft ambient
+    const dir1 = new THREE.DirectionalLight(COLORS.wire, 1.8);
+    dir1.position.set(5, 6, 8);
+    scene.add(dir1);
+
+    const dir2 = new THREE.DirectionalLight(COLORS.fill, 1.1);
+    dir2.position.set(-6, -3, -4);
+    scene.add(dir2);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambient);
+
+    // Controls (mouse/touch)
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.rotateSpeed = 0.55;
+    controls.minDistance = 3.6;
+    controls.maxDistance = 8.5;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.35;
+    controls.target.set(0, 0, 0);
+
+    // Subtle parallax based on pointer to make it feel alive even without dragging
+    const pointer = new THREE.Vector2(0, 0);
+    let hovering = false;
+
+    function setPointer(e){
+      const r = stage.getBoundingClientRect();
+      const x = ( (e.clientX - r.left) / r.width ) * 2 - 1;
+      const y = ( (e.clientY - r.top) / r.height ) * 2 - 1;
+      pointer.set(x, y);
+    }
+
+    stage.addEventListener('pointermove', (e)=>{ setPointer(e); hovering = true; });
+    stage.addEventListener('pointerleave', ()=>{ hovering = false; });
+    stage.addEventListener('pointerdown', ()=>{ controls.autoRotate = false; });
+    stage.addEventListener('pointerup', ()=>{ controls.autoRotate = true; });
+
+    // Animate
+    const tmp = new THREE.Vector3();
+    function tick(){
+      // Gentle idle rotation
+      group.rotation.y += 0.0025;
+
+      // Parallax tilt toward the pointer
+      const targetRX = THREE.MathUtils.lerp(group.rotation.x, pointer.y * -0.25, 0.06);
+      const targetRY = THREE.MathUtils.lerp(group.rotation.y, group.rotation.y + pointer.x * 0.12, 0.05);
+      group.rotation.x = targetRX;
+      group.rotation.y = targetRY;
+
+      // Move key light a bit with pointer for more drama
+      dir1.position.lerp(tmp.set(5 + pointer.x * 2.5, 6 + pointer.y * 2.0, 8), 0.05);
+
+      controls.update();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    onResize();
+    tick();
+  </script>
+</body>
+</html>
