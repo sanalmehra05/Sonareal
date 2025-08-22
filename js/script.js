@@ -470,3 +470,37 @@ const bars = document.querySelectorAll('.wave-bar');
 
     // Randomize heights every 250ms
     setInterval(randomizeHeights, 250);
+
+
+
+const terminalLines = [
+  "> INITIALIZING Sonareal SYSTEM...",
+  "> CONNECTION ESTABLISHED: www.sonareal.com",
+  "> SECURITY PROTOCOL: ENABLED",
+  "> LOADING CREATIVE MATRIX...",
+  "> CYBER MODULES: ONLINE",
+  "> DATA STREAM: STABLE",
+];
+
+const terminalContent = document.getElementById('terminalContent');
+let lineIndex = 0;
+
+function addTerminalLine() {
+  if (lineIndex < terminalLines.length) {
+    const line = document.createElement('div');
+    line.className = 'terminal-line';
+    line.textContent = terminalLines[lineIndex];
+    terminalContent.appendChild(line);
+
+    // Animate the line
+    gsap.to(line, {
+    opacity: 1,
+    duration: 0.5,
+    onComplete: function() {
+        lineIndex++;
+        setTimeout(addTerminalLine, 200);
+      }
+    });
+  }
+}
+setTimeout(addTerminalLine, 1000);
