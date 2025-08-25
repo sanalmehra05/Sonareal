@@ -709,8 +709,10 @@ h4:after {
   background: #ffedfe;
   color: #5d18a7c4;
   text-decoration: none;
-  font-family: 'Benzin-Semibold'; 
+  font-family: 'Coolvetica', sans-serif; 
   font-size: 20px;
+  font-weight: 100;
+  letter-spacing: 2px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 0 15px #5e27d9;
@@ -1298,6 +1300,178 @@ section {
 
 .bundle-card:hover::before {
   transform: scaleX(1);
+}
+
+.container {
+  width: 100%;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #e2e8f0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  margin-bottom: 50px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.carousel-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 30px 0;
+}
+
+.carousel-track {
+  display: flex;
+  width: calc(250px * 14); /* Double the items for seamless loop */
+}
+
+.carousel-item {
+  width: 30vw;
+  flex-shrink: 0;
+  height: 50vh;
+  padding: 20px;
+  background:
+    radial-gradient(60% 80% at 100% 0%,
+      #A087FF5C 0%,   /* 36% */
+      #A087FF1F 45%,  /* 12% */
+      transparent 70%),
+    radial-gradient(40% 60% at 0% 0%,
+      #C9B0FF2E 0%,   /* 18% */
+      #C9B0FF0F 40%,  /* 6%  */
+      transparent 70%),
+    #0F0F12; 
+  border-radius: 12px;
+  margin: 0 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid #a87ccd;;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.carousel-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.review-text {
+  text-align: left;
+  font-style: italic;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reviewer {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.reviewer-info {
+  text-align: left;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #e2e8f0;
+}
+
+.reviewer-role {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.stars {
+  color: #fbbf24;
+  margin-top: 5px;
+  font-size: 0.9rem;
+}
+
+@keyframes slide {
+  from {
+      transform: translateX(0);
+  }
+  to {
+      transform: translateX(calc(-250px * 7)); /* Move by half the items */
+  }
+}
+
+.carousel-track {
+  animation: slide 30s linear infinite;
+}
+
+.carousel-container:hover .carousel-track {
+  animation-play-state: paused;
+}
+
+.carousel-container::before,
+.carousel-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  z-index: 2;
+}
+
+.carousel-container::before {
+  left: 0;
+  width: 30vw;
+  background: linear-gradient(to right, #1d1b1c 0%, transparent 100%);
+}
+
+.carousel-container::after {
+  right: 0;
+  width: 30vw;
+  background: linear-gradient(to left, #1d1b1c 0%, transparent 100%);
+}
+
+
+@media (max-width: 768px) {
+  h1 {
+      font-size: 2rem;
+  }
+  
+  .subtitle {
+      font-size: 1rem;
+  }
+  
+  .carousel-item {
+      width: 220px;
+  }
 }
 
 

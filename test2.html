@@ -1,495 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cyber Grid: Neon Matrix — Pro</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400&display=swap" rel="stylesheet">
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root{
-      --bg:#0a0a12;
-      --glass: rgba(0,10,30,.55);
-      --line: rgba(0,243,255,.25);
-      --txt:#e0e0ff;
-      --accent:#00f3ff;
-      --accent-2:#ff00c8;
-      --accent-3:#00ff87;
-    }
-
-    html,body{ height:100%; background:var(--bg); color:var(--txt); font-family:'Exo 2',sans-serif; }
-    body{ overflow:hidden; touch-action:none; user-select:none; }
-
-    /* Canvas host */
-    #canvas-container{
-      position:fixed; inset:0; z-index:1;
-    }
-
-    /* Vignette + gradient glow background */
-    .backdrop{
-      pointer-events:none; position:fixed; inset:-20vmax; z-index:0; filter:blur(60px) saturate(120%);
-      background:
-        radial-gradient(60vmax 40vmax at 10% -5%, rgba(0,243,255,.25), transparent 60%),
-        radial-gradient(60vmax 40vmax at 90% -5%, rgba(255,0,200,.2), transparent 60%),
-        radial-gradient(70vmax 50vmax at 50% 120%, rgba(0,255,135,.18), transparent 60%);
-    }
-    .vignette{
-      pointer-events:none; position:fixed; inset:0; z-index:0;
-      background: radial-gradient(100% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.35) 100%);
-    }
-
-    /* UI */
-    .ui-layer{
-      position:fixed; inset:0; z-index:2;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;
-    }
-    .header{ position:absolute; top:5%; width:100%; text-align:center; }
-    .title{
-      font-family:'Orbitron',sans-serif; font-size:clamp(1.6rem, 3.8vw, 3rem); letter-spacing:.6em; text-transform:uppercase;
-      background:linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      text-shadow:0 0 24px rgba(0,243,255,.25); margin-bottom:.6rem;
-    }
-    .subtitle{
-      font-size:clamp(.9rem, 1.5vw, 1.1rem); letter-spacing:.2em; opacity:.75; max-width:720px; margin:0 auto;
-    }
-
-    .terminal{
-      position:absolute; top:20%; width:min(90%,720px); height:120px;
-      background:var(--glass); border:1px solid var(--line); border-radius:6px; padding:14px;
-      font-family: 'Exo 2', monospace; font-size:.95rem; line-height:1.35; overflow:hidden; opacity:.9; backdrop-filter: blur(6px);
-    }
-    .terminal-line{ opacity:.9; margin-bottom:6px; }
-    .terminal .ok{ color:var(--accent); }
-    .terminal-cursor{ display:inline-block; width:8px; height:14px; background:var(--accent); margin-left:6px; animation:blink 1s infinite; vertical-align:middle; }
-
-    .instruction{
-      position:absolute; bottom:15%; font-size:clamp(1rem,2.2vw,1.25rem); font-weight:300; letter-spacing:.35em; text-align:center;
-      opacity:.9; text-shadow:0 0 14px rgba(0,243,255,.35); transition: all .75s ease;
-      padding:12px 26px; background:var(--glass); border:1px solid var(--line); backdrop-filter: blur(6px);
-    }
-
-    .grid-controls{
-      position:absolute; bottom:10%; display:flex; gap:18px; opacity:.95; flex-wrap:wrap; justify-content:center;
-    }
-    .control-btn{
-      pointer-events:auto; cursor:pointer; user-select:none;
-      background:var(--glass); border:1px solid rgba(0,243,255,.35);
-      color:rgba(224,224,255,.95); padding:9px 18px; letter-spacing:.2em; border-radius:6px;
-      font-family:'Exo 2',sans-serif; font-size:.9rem; transition:.25s; backdrop-filter: blur(6px);
-    }
-    .control-btn:hover{ transform:translateY(-1px) scale(1.02); box-shadow:0 0 18px rgba(0,243,255,.25); border-color:rgba(0,243,255,.8); }
-    .control-btn:active{ transform:translateY(0) scale(0.995); opacity:.9; }
-
-    .grid-stats{
-      position:absolute; bottom:5%; left:50%; transform:translateX(-50%);
-      display:flex; gap:26px; font-size:.85rem; letter-spacing:.15em; opacity:.75; flex-wrap:wrap; justify-content:center;
-    }
-    .stat{ display:flex; flex-direction:column; align-items:center; }
-    .stat-value{ font-family:'Orbitron',sans-serif; font-size:1.2rem; margin-top:6px; color:var(--accent); text-shadow:0 0 10px var(--accent); }
-
-    .scanline{
-      position:fixed; inset:0; background:linear-gradient(to bottom, rgba(0,243,255,.14) 0%, transparent 100%); height:22px;
-      animation: scan 6s linear infinite; z-index:3; pointer-events:none; opacity:.18;
-    }
-    .noise{
-      position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      opacity:.03; z-index:4; pointer-events:none;
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      .scanline{ animation: none; display:none; }
-      .instruction, .control-btn{ transition:none; }
-    }
-
-    @keyframes blink{ 0%,100%{opacity:1} 50%{opacity:0} }
-    @keyframes scan{ 0%{ transform:translateY(-100%) } 100%{ transform:translateY(100vh) } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Review Carousel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: black;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .carousel-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding: 30px 0;
+        }
+        
+        .carousel-track {
+            display: flex;
+            width: calc(250px * 14); /* Double the items for seamless loop */
+        }
+        
+        .carousel-item {
+            width: 30vw;
+            flex-shrink: 0;
+            height: 50vh;
+            padding: 20px;
+            background:
+              radial-gradient(60% 80% at 100% 0%,
+                #A087FF5C 0%,   /* 36% */
+                #A087FF1F 45%,  /* 12% */
+                transparent 70%),
+              radial-gradient(40% 60% at 0% 0%,
+                #C9B0FF2E 0%,   /* 18% */
+                #C9B0FF0F 40%,  /* 6%  */
+                transparent 70%),
+              #0F0F12; 
+            border-radius: 12px;
+            margin: 0 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 2px solid #a87ccd;;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .carousel-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        
+        .review-text {
+            text-align: left;
+            font-style: italic;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .reviewer {
+            display: flex;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .reviewer-info {
+            text-align: left;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #e2e8f0;
+        }
+        
+        .reviewer-role {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        
+        .stars {
+            color: #fbbf24;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        @keyframes slide {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(calc(-250px * 7)); /* Move by half the items */
+            }
+        }
+        
+        .carousel-track {
+            animation: slide 30s linear infinite;
+        }
+        
+        .carousel-container:hover .carousel-track {
+            animation-play-state: paused;
+        }
+        
+        .carousel-container::before,
+        .carousel-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 100%;
+            z-index: 2;
+        }
+        
+        .carousel-container::before {
+            left: 0;
+            width: 30vw;
+            background: linear-gradient(to right, black 0%, transparent 100%);
+        }
+        
+        .carousel-container::after {
+            right: 0;
+            width: 30vw;
+            background: linear-gradient(to left, black 0%, transparent 100%);
+        }
+        
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .carousel-item {
+                width: 220px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="canvas-container" aria-label="Neon cyber grid animation" role="img"></div>
-  <div class="backdrop"></div>
-  <div class="vignette"></div>
-
-  <div class="ui-layer">
-    <div class="header">
-      <div class="title">CYBER GRID</div>
-      <div class="subtitle">NEURAL MATRIX INTERFACE v2.1.0 — Optimized Instancing · Smart Interaction · Mobile Ready</div>
+    <div class="container">
+        <h1>What Our Customers Say</h1>
+        <p class="subtitle">Don't just take our word for it - read testimonials from our satisfied clients</p>
+        
+        <div class="carousel-container">
+            <div class="carousel-track">
+                <!-- Reviews will be duplicated in JavaScript for seamless loop -->
+            </div>
+        </div>
     </div>
 
-    <div class="terminal" aria-live="polite">
-      <div class="terminal-line">› INIT: <span class="ok">OK</span> — Bootstrapping renderer...</div>
-      <div class="terminal-line">› GRID SYNCHRONIZATION: <span id="sync-status">97%</span></div>
-      <div class="terminal-line">› USER AUTH: <span class="ok">VERIFIED</span> <span class="terminal-cursor"></span></div>
-    </div>
-
-    <div class="instruction" id="instruction">MANIPULATE THE GRID WITH YOUR CURSOR</div>
-
-    <div class="grid-controls">
-      <button class="control-btn" id="pulse-btn">ENERGY PULSE</button>
-      <button class="control-btn" id="toggle-rotate-btn">TOGGLE ROTATION</button>
-      <button class="control-btn" id="reset-btn">RESET GRID</button>
-      <button class="control-btn" id="density-btn">DENSITY +</button>
-      <button class="control-btn" id="density-dec-btn">DENSITY −</button>
-    </div>
-
-    <div class="grid-stats">
-      <div class="stat"><span>NODES ACTIVE</span><span class="stat-value" id="node-count">0</span></div>
-      <div class="stat"><span>ENERGY LEVEL</span><span class="stat-value" id="energy-level">0%</span></div>
-      <div class="stat"><span>CONNECTIONS</span><span class="stat-value" id="connection-count">0</span></div>
-      <div class="stat"><span>FPS</span><span class="stat-value" id="fps">—</span></div>
-    </div>
-  </div>
-
-  <div class="scanline"></div>
-  <div class="noise"></div>
-
-  <!-- THREE as module for modern builds -->
-  <script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-
-    // ---------- DOM ----------
-    const els = {
-      container: document.getElementById('canvas-container'),
-      nodeCount: document.getElementById('node-count'),
-      energyLevel: document.getElementById('energy-level'),
-      connectionCount: document.getElementById('connection-count'),
-      sync: document.getElementById('sync-status'),
-      fps: document.getElementById('fps'),
-      instruction: document.getElementById('instruction'),
-      pulseBtn: document.getElementById('pulse-btn'),
-      resetBtn: document.getElementById('reset-btn'),
-      toggleRotateBtn: document.getElementById('toggle-rotate-btn'),
-      densInc: document.getElementById('density-btn'),
-      densDec: document.getElementById('density-dec-btn'),
-    };
-
-    // ---------- State ----------
-    const state = {
-      gridHalfCount: 15,          // nodes each way (total = (2n+1)^2). Use buttons to change.
-      spacing: 2.7,
-      rotationOn: true,
-      energy: 0,
-      lastPulse: 0,
-      mouseDown: false,
-      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    };
-
-    // ---------- Renderer / Scene / Camera ----------
-    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    els.container.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x050510, 24, 120);
-
-    const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-    camera.position.set(0, 11, 42);
-    const cameraTarget = new THREE.Vector3(0, 0, 0);
-
-    // ---------- Lights ----------
-    scene.add(new THREE.AmbientLight(0x444466, 0.35));
-    const key = new THREE.DirectionalLight(0x00f3ff, 0.9); key.position.set(1.2, 1.5, 0.8); scene.add(key);
-    const rim = new THREE.DirectionalLight(0xff00c8, 0.35); rim.position.set(-1.2, 0.8, -1.4); scene.add(rim);
-
-    // ---------- Groups ----------
-    const gridGroup = new THREE.Group();
-    scene.add(gridGroup);
-
-    // ---------- Particles ----------
-    const particleCount = 700;
-    const particleGeom = new THREE.BufferGeometry();
-    const pPos = new Float32Array(particleCount*3);
-    const pCol = new Float32Array(particleCount*3);
-    for(let i=0;i<particleCount;i++){
-      const idx = i*3;
-      pPos[idx+0] = (Math.random()-0.5)*120;
-      pPos[idx+1] = Math.random()*40 + 2;
-      pPos[idx+2] = (Math.random()-0.5)*120;
-      const palette = [[0,0.95,1],[1,0,0.78],[0,1,0.53]];
-      const c = palette[Math.floor(Math.random()*palette.length)];
-      pCol[idx+0]=c[0]; pCol[idx+1]=c[1]; pCol[idx+2]=c[2];
-    }
-    particleGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    particleGeom.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
-    const particleMat = new THREE.PointsMaterial({ size:0.16, vertexColors:true, transparent:true, opacity:0.7, blending:THREE.AdditiveBlending });
-    const particleSys = new THREE.Points(particleGeom, particleMat);
-    scene.add(particleSys);
-
-    // ---------- Grid (Instanced) + Connections (LineSegments) ----------
-    let nodesMesh, nodeCount, positionsXZ = [], targetY = [], intensity = [];
-    let lineGeom, lineSegs, linkPairs = [], connectionCount = 0;
-
-    function buildGrid(){
-      // clear
-      if(nodesMesh){ gridGroup.remove(nodesMesh); nodesMesh.geometry.dispose(); }
-      if(lineSegs){ scene.remove(lineSegs); lineSegs.geometry.dispose(); }
-
-      const n = state.gridHalfCount, s = state.spacing;
-      const total = (2*n+1)*(2*n+1);
-      positionsXZ = new Array(total);
-      targetY = new Float32Array(total);
-      intensity = new Float32Array(total);
-
-      // Nodes (instanced)
-      const geo = new THREE.IcosahedronGeometry(0.38, 2);
-      const mat = new THREE.MeshStandardMaterial({
-        color:0x00aaff, emissive:0x0044aa, roughness:0.35, metalness:0.2,
-        transparent:true, opacity:0.9, vertexColors:true
-      });
-      nodesMesh = new THREE.InstancedMesh(geo, mat, total);
-      nodesMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      nodesMesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(total*3), 3);
-      gridGroup.add(nodesMesh);
-
-      // seed transforms + colors
-      const m = new THREE.Matrix4(); const c = new THREE.Color();
-      let i = 0;
-      for(let gz=-n; gz<=n; gz++){
-        for(let gx=-n; gx<=n; gx++){
-          const x = gx*s, z = gz*s;
-          positionsXZ[i] = {x, z};
-          m.setPosition(x, 0, z);
-          nodesMesh.setMatrixAt(i, m);
-          c.setHSL((gx/40)+0.55, 0.75, 0.55);
-          nodesMesh.instanceColor.setXYZ(i, c.r, c.g, c.b);
-          i++;
-        }
-      }
-      nodesMesh.instanceColor.needsUpdate = true;
-      nodeCount = total;
-
-      // Connections (link to right & forward only to avoid duplicates)
-      linkPairs = [];
-      const cols = 2*n+1;
-      for(let zi=0; zi<cols; zi++){
-        for(let xi=0; xi<cols; xi++){
-          const idx = zi*cols + xi;
-          if(xi<cols-1) linkPairs.push([idx, idx+1]);
-          if(zi<cols-1) linkPairs.push([idx, idx+cols]);
-          // diagonals look nice but heavy; keep minimal for perf
-          // if(xi<cols-1 && zi<cols-1) linkPairs.push([idx, idx+cols+1]);
-        }
-      }
-      connectionCount = linkPairs.length;
-
-      const linePos = new Float32Array(connectionCount*2*3);
-      lineGeom = new THREE.BufferGeometry();
-      lineGeom.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-      const lineMat = new THREE.LineBasicMaterial({ color:0x00aaff, transparent:true, opacity:0.22 });
-      lineSegs = new THREE.LineSegments(lineGeom, lineMat);
-      scene.add(lineSegs);
-
-      // initialize line positions (y=0)
-      updateLinePositions(true);
-
-      // stats
-      els.nodeCount.textContent = nodeCount.toLocaleString();
-      els.connectionCount.textContent = connectionCount.toLocaleString();
-    }
-
-    function updateLinePositions(init=false){
-      const posAttr = lineSegs.geometry.getAttribute('position');
-      const arr = posAttr.array;
-
-      const dummy = new THREE.Matrix4();
-      const p1 = new THREE.Vector3(), p2 = new THREE.Vector3();
-
-      for(let i=0;i<linkPairs.length;i++){
-        const [a,b] = linkPairs[i];
-        const ax = positionsXZ[a].x, az = positionsXZ[a].z;
-        const bx = positionsXZ[b].x, bz = positionsXZ[b].z;
-        const ay = targetY[a] ?? 0;
-        const by = targetY[b] ?? 0;
-
-        const base = i*6;
-        arr[base+0] = ax; arr[base+1] = ay; arr[base+2] = az;
-        arr[base+3] = bx; arr[base+4] = by; arr[base+5] = bz;
-      }
-
-      posAttr.needsUpdate = true;
-      if(init) lineSegs.frustumCulled = false;
-    }
-
-    // ---------- Interaction via plane-ray ----------
-    const raycaster = new THREE.Raycaster();
-    const mouseNDC = new THREE.Vector2();
-    const planeY0 = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
-    const hitPoint = new THREE.Vector3();
-
-    function updateMouseFromEvent(clientX, clientY){
-      mouseNDC.set((clientX/innerWidth)*2 -1, -(clientY/innerHeight)*2 +1);
-      raycaster.setFromCamera(mouseNDC, camera);
-      raycaster.ray.intersectPlane(planeY0, hitPoint); // world coordinates on y=0 plane
-    }
-    window.addEventListener('mousemove', (e)=> updateMouseFromEvent(e.clientX, e.clientY), {passive:true});
-    window.addEventListener('mousedown', ()=>{ state.mouseDown = true; els.instruction.textContent='ENERGY BUILDUP DETECTED'; });
-    window.addEventListener('mouseup', ()=>{ state.mouseDown = false; els.instruction.textContent='MANIPULATE THE GRID WITH YOUR CURSOR'; });
-
-    // Touch
-    window.addEventListener('touchmove', (e)=>{ if(e.touches.length){ updateMouseFromEvent(e.touches[0].clientX, e.touches[0].clientY);} }, {passive:true});
-    window.addEventListener('touchstart', ()=>{ state.mouseDown = true; els.instruction.textContent='ENERGY BUILDUP DETECTED'; }, {passive:true});
-    window.addEventListener('touchend', ()=>{ state.mouseDown = false; els.instruction.textContent='MANIPULATE THE GRID WITH YOUR CURSOR'; }, {passive:true});
-
-    // ---------- Energy Pulse ----------
-    function energyPulse(){
-      state.energy = 100; updateEnergyUI();
-      const pulse = new THREE.Mesh(
-        new THREE.RingGeometry(1, 1.02, 64),
-        new THREE.MeshBasicMaterial({ color:0x00f3ff, transparent:true, opacity:0.9, side:THREE.DoubleSide })
-      );
-      pulse.rotation.x = -Math.PI/2;
-      pulse.position.set((Math.random()-0.5)*state.gridHalfCount*state.spacing*1.2, 0.02, (Math.random()-0.5)*state.gridHalfCount*state.spacing*1.2);
-      scene.add(pulse);
-
-      const maxScale = 55;
-      let scale = 1;
-      (function grow(){
-        scale += 1.35;
-        pulse.scale.set(scale, scale, 1);
-        pulse.material.opacity = Math.max(0, 1 - (scale/maxScale));
-        if(scale<maxScale && !state.reducedMotion) requestAnimationFrame(grow);
-        else scene.remove(pulse);
-      })();
-    }
-
-    // ---------- UI handlers ----------
-    els.pulseBtn.addEventListener('click', ()=>{ if(performance.now()-state.lastPulse>1200){ energyPulse(); state.lastPulse=performance.now(); } });
-    els.resetBtn.addEventListener('click', resetGrid);
-    els.toggleRotateBtn.addEventListener('click', ()=> state.rotationOn = !state.rotationOn);
-    els.densInc.addEventListener('click', ()=>{ state.gridHalfCount = Math.min(22, state.gridHalfCount+1); buildGrid(); });
-    els.densDec.addEventListener('click', ()=>{ state.gridHalfCount = Math.max(8, state.gridHalfCount-1); buildGrid(); });
-
-    function resetGrid(){
-      targetY.fill(0); intensity.fill(0);
-      const m = new THREE.Matrix4();
-      for(let i=0;i<nodeCount;i++){
-        const {x,z} = positionsXZ[i];
-        m.setPosition(x, 0, z);
-        nodesMesh.setMatrixAt(i, m);
-      }
-      nodesMesh.instanceMatrix.needsUpdate = true;
-      updateLinePositions();
-      els.instruction.textContent = 'GRID RESET COMPLETE';
-      setTimeout(()=> els.instruction.textContent='MANIPULATE THE GRID WITH YOUR CURSOR', 1600);
-    }
-
-    function updateEnergyUI(){
-      els.energyLevel.textContent = `${Math.round(state.energy)}%`;
-      els.sync.textContent = `${100 - Math.floor(Math.random()*3)}%`;
-    }
-
-    // ---------- Build initial grid ----------
-    buildGrid();
-
-    // ---------- Resize ----------
-    let resizeRAF = 0;
-    addEventListener('resize', ()=>{
-      cancelAnimationFrame(resizeRAF);
-      resizeRAF = requestAnimationFrame(()=>{
-        camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
-        renderer.setSize(innerWidth, innerHeight);
-      });
-    });
-
-    // ---------- Main loop ----------
-    const clock = new THREE.Clock();
-    const tmpM = new THREE.Matrix4();
-    const baseColor = new THREE.Color(0x00aaff);
-    const emissiveBase = new THREE.Color(0x0044aa);
-    let lastFpsStamp = 0, frameCount = 0;
-
-    function animate(){
-      const t = clock.getElapsedTime();
-      const dt = clock.getDelta();
-      requestAnimationFrame(animate);
-
-      // Particles drift
-      const p = particleGeom.attributes.position.array;
-      for(let i=0;i<p.length;i+=3){
-        p[i]   += Math.sin(t*0.7 + i)*0.02;
-        p[i+1] += Math.cos(t*0.35 + i)*0.012;
-        p[i+2] += Math.sin(t*0.5 + i)*0.025;
-        // wrap
-        if(p[i] > 60) p[i]=-60; else if(p[i]<-60) p[i]=60;
-        if(p[i+1] > 60) p[i+1]=2; else if(p[i+1]<-5) p[i+1]=40;
-        if(p[i+2] > 60) p[i+2]=-60; else if(p[i+2]<-60) p[i+2]=60;
-      }
-      particleGeom.attributes.position.needsUpdate = true;
-
-      // Interaction falloff
-      const influenceRadius = state.mouseDown ? state.spacing*6.2 : state.spacing*4.5;
-      const influenceStrength = state.mouseDown ? 1.8 : 1.0;
-
-      // Update nodes (heights/intensity/colors) using instancing
-      const cols = 2*state.gridHalfCount + 1;
-      for(let i=0;i<nodeCount;i++){
-        const {x,z} = positionsXZ[i];
-        const dx = x - hitPoint.x;
-        const dz = z - hitPoint.z;
-        const dist = Math.hypot(dx, dz);
-        const falloff = Math.max(0, 1 - (dist/influenceRadius));
-        const pulse = Math.sin(t*3 + (x+z)*0.15);
-
-        const target = falloff * pulse * 3.8 * influenceStrength;
-        // smooth approach to target
-        targetY[i] += (target - targetY[i]) * Math.min(1, dt*5);
-        intensity[i] += ((falloff>0 ? 1 : 0) - intensity[i]) * Math.min(1, dt*2.5);
-
-        // update instance matrix
-        tmpM.makeTranslation(x, targetY[i], z);
-        nodesMesh.setMatrixAt(i, tmpM);
-
-        // update instance color gently (HSL shift)
-        const hue = (x*0.005 + t*0.08) % 1;
-        const light = 0.45 + 0.35 * intensity[i];
-        const col = new THREE.Color().setHSL(hue, 0.8, light);
-        nodesMesh.instanceColor.setXYZ(i, col.r, col.g, col.b);
-      }
-      nodesMesh.instanceMatrix.needsUpdate = true;
-      nodesMesh.instanceColor.needsUpdate = true;
-
-      // Lines: only y changes
-      updateLinePositions();
-
-      // Energy decay
-      if(state.energy>0){
-        state.energy = Math.max(0, state.energy - dt*32);
-        updateEnergyUI();
-      }
-
-      // Rotate grid + subtle camera bob
-      if(state.rotationOn && !state.reducedMotion){
-        gridGroup.rotation.y += dt*0.35 * 0.15;
-        camera.position.x = Math.sin(t*0.22)*10;
-        camera.position.z = 42 + Math.sin(t*0.28)*5;
-      }
-      camera.lookAt(cameraTarget);
-
-      renderer.render(scene, camera);
-
-      // FPS (cheap)
-      frameCount++;
-      const now = performance.now();
-      if(now - lastFpsStamp > 500){
-        els.fps.textContent = Math.round(frameCount * 1000 / (now - lastFpsStamp));
-        lastFpsStamp = now; frameCount = 0;
-      }
-    }
-    animate();
-
-    // Initial mouse center
-    updateMouseFromEvent(innerWidth*0.5, innerHeight*0.6);
-
-    // Little boot flourish
-    setTimeout(()=> { if(!state.reducedMotion) energyPulse(); }, 700);
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviews = [
+                {
+                    text: "This service completely transformed my business. The results were beyond my expectations and the team was incredibly professional.",
+                    name: "Sarah Johnson",
+                    role: "Marketing Director",
+                    initials: "SJ",
+                    stars: 5
+                },
+                {
+                    text: "I was skeptical at first, but I'm so glad I decided to try it. The value for money is exceptional!",
+                    name: "Michael Chen",
+                    role: "Startup Founder",
+                    initials: "MC",
+                    stars: 5
+                },
+                {
+                    text: "Outstanding support and incredible attention to detail. Will definitely be using again for future projects.",
+                    name: "Emma Rodriguez",
+                    role: "Product Manager",
+                    initials: "ER",
+                    stars: 5
+                },
+                {
+                    text: "The quality of work exceeded my expectations. delivered on time and within budget. Highly recommend!",
+                    name: "James Wilson",
+                    role: "Creative Director",
+                    initials: "JW",
+                    stars: 5
+                },
+                {
+                    text: "A game-changer for our organization. The insights we gained have helped us improve our customer satisfaction significantly.",
+                    name: "Lisa Thompson",
+                    role: "Operations Manager",
+                    initials: "LT",
+                    stars: 5
+                },
+                {
+                    text: "Efficient, professional, and truly innovative. I'm impressed with how quickly they understood our needs.",
+                    name: "Robert Zhang",
+                    role: "Tech Lead",
+                    initials: "RZ",
+                    stars: 5
+                },
+                {
+                    text: "The team was responsive and adaptable to our changing requirements. A pleasure to work with from start to finish.",
+                    name: "Amanda Williams",
+                    role: "Business Owner",
+                    initials: "AW",
+                    stars: 5
+                }
+            ];
+            
+            const carouselTrack = document.querySelector('.carousel-track');
+            
+            // Function to generate star rating HTML
+            function generateStars(rating) {
+                let starsHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    if (i < rating) {
+                        starsHTML += '★';
+                    } else {
+                        starsHTML += '☆';
+                    }
+                }
+                return `<div class="stars">${starsHTML}</div>`;
+            }
+            
+            // Function to create review elements
+            function createReviewElement(review) {
+                const div = document.createElement('div');
+                div.className = 'carousel-item';
+                
+                div.innerHTML = `
+                    <p class="review-text">"${review.text}"</p>
+                    <div>
+                        <div class="reviewer">
+                            <div class="avatar">${review.initials}</div>
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">${review.name}</div>
+                                <div class="reviewer-role">${review.role}</div>
+                            </div>
+                        </div>
+                        ${generateStars(review.stars)}
+                    </div>
+                `;
+                
+                return div;
+            }
+            
+            // Populate the carousel with reviews (duplicated for seamless loop)
+            reviews.forEach(review => {
+                carouselTrack.appendChild(createReviewElement(review));
+            });
+            
+            // Duplicate the reviews for the infinite loop effect
+            reviews.forEach(review => {
+                carouselTrack.appendChild(createReviewElement(review));
+            });
+          
+        });
+    </script>
 </body>
 </html>

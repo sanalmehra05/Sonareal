@@ -504,3 +504,106 @@ function addTerminalLine() {
   }
 }
 setTimeout(addTerminalLine, 1000);
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  const reviews = [
+      {
+          text: "This service completely transformed my business. The results were beyond my expectations and the team was incredibly professional.",
+          name: "Sarah Johnson",
+          role: "Marketing Director",
+          initials: "SJ",
+          stars: 5
+      },
+      {
+          text: "I was skeptical at first, but I'm so glad I decided to try it. The value for money is exceptional!",
+          name: "Michael Chen",
+          role: "Startup Founder",
+          initials: "MC",
+          stars: 5
+      },
+      {
+          text: "Outstanding support and incredible attention to detail. Will definitely be using again for future projects.",
+          name: "Emma Rodriguez",
+          role: "Product Manager",
+          initials: "ER",
+          stars: 5
+      },
+      {
+          text: "The quality of work exceeded my expectations. delivered on time and within budget. Highly recommend!",
+          name: "James Wilson",
+          role: "Creative Director",
+          initials: "JW",
+          stars: 5
+      },
+      {
+          text: "A game-changer for our organization. The insights we gained have helped us improve our customer satisfaction significantly.",
+          name: "Lisa Thompson",
+          role: "Operations Manager",
+          initials: "LT",
+          stars: 5
+      },
+      {
+          text: "Efficient, professional, and truly innovative. I'm impressed with how quickly they understood our needs.",
+          name: "Robert Zhang",
+          role: "Tech Lead",
+          initials: "RZ",
+          stars: 5
+      },
+      {
+          text: "The team was responsive and adaptable to our changing requirements. A pleasure to work with from start to finish.",
+          name: "Amanda Williams",
+          role: "Business Owner",
+          initials: "AW",
+          stars: 5
+      }
+  ];
+  
+  const carouselTrack = document.querySelector('.carousel-track');
+  
+  // Function to generate star rating HTML
+  function generateStars(rating) {
+      let starsHTML = '';
+      for (let i = 0; i < 5; i++) {
+          if (i < rating) {
+              starsHTML += '★';
+          } else {
+              starsHTML += '☆';
+          }
+      }
+      return `<div class="stars">${starsHTML}</div>`;
+  }
+  
+  // Function to create review elements
+  function createReviewElement(review) {
+      const div = document.createElement('div');
+      div.className = 'carousel-item';
+      
+      div.innerHTML = `
+          <p class="review-text">"${review.text}"</p>
+          <div>
+              <div class="reviewer">
+                  <div class="avatar">${review.initials}</div>
+                  <div class="reviewer-info">
+                      <div class="reviewer-name">${review.name}</div>
+                      <div class="reviewer-role">${review.role}</div>
+                  </div>
+              </div>
+              ${generateStars(review.stars)}
+          </div>
+      `;
+      
+      return div;
+  }
+  
+  // Populate the carousel with reviews (duplicated for seamless loop)
+  reviews.forEach(review => {
+      carouselTrack.appendChild(createReviewElement(review));
+  });
+  
+  // Duplicate the reviews for the infinite loop effect
+  reviews.forEach(review => {
+      carouselTrack.appendChild(createReviewElement(review));
+  });
+
+});
