@@ -607,3 +607,100 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 });
+
+import * as THREE from 'three';
+
+function initProjectDistortion() {
+  const container = document.querySelector('.project-container');
+  const canvas = document.getElementById('projectCanvas');
+  const video = document.getElementById('projectVideo');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const videoTexture = new THREE.VideoTexture(video);
+
+  const uniforms = {
+    uTexture: { value: videoTexture },
+    uMouse: { value: new THREE.Vector2(0.5, 0.5) },
+    uTime: { value: 0.0 },
+    uStrength: { value: 0.0 }
+  };
+
+  const material = new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D uTexture;
+      uniform vec2 uMouse;
+      uniform float uTime;
+      uniform float uStrength;
+      varying vec2 vUv;
+
+      void main(){
+        float dist = distance(vUv, uMouse);
+        float radius = 0.25;
+        vec2 uv = vUv;
+
+        if(dist < radius){
+          float strength = (radius - dist) / radius * uStrength;
+          uv.x += sin(uv.y * 30.0 + uTime * 2.0) * 0.02 * strength;
+          uv.y += cos(uv.x * 30.0 + uTime * 2.0) * 0.02 * strength;
+        }
+
+        gl_FragColor = texture2D(uTexture, uv);
+      }
+    `
+  });
+
+  const geo = new THREE.PlaneGeometry(2, 2);
+  const mesh = new THREE.Mesh(geo, material);
+  scene.add(mesh);
+
+  // Track mouse speed + position
+  let lastX = 0, lastY = 0, lastTime = Date.now();
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = 1.0 - (e.clientY - rect.top) / rect.height;
+    uniforms.uMouse.value.set(x, y);
+
+    const now = Date.now();
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    const dt = now - lastTime;
+    const speed = Math.sqrt(dx*dx + dy*dy) / Math.max(dt,1);
+    uniforms.uStrength.value = Math.min(speed * 0.2, 1.0);
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+    lastTime = now;
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    uniforms.uTime.value += 0.05;
+    uniforms.uStrength.value *= 0.95; // decay
+    renderer.render(scene, camera);
+  }
+  animate();
+  // 1. Ensure video actually plays
+  video.play().catch(err => console.warn("Autoplay blocked:", err));
+
+  window.addEventListener('resize', () => {
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+}
+
+// Run after DOM is ready
+document.addEventListener('DOMContentLoaded', initProjectDistortion);

@@ -225,7 +225,7 @@
       <div class="about-boxes about-box-left"><img src="./assets/images/artworkOne.png" width="100%"></div>
     </div>
     <div class="about-right-flex">
-      <div class="about-boxes about-box-right"></div>
+      <div class="about-boxes about-box-right"><img src="./assets/images/Ren_Project_Idle.gif" width="40%"></div>
     </div>
   </div>
 
@@ -267,31 +267,46 @@
     </div>
   </section>
 
-  <section id="projects" class="projects">
-    <h2 class="section-title">PROJECTS</h2>
-    <div class="projects-grid">
+  <div class="project-container">
+    <video id="projectVideo" autoplay loop muted playsinline style="display:none">
+      <source src="./assets/videos/project-bg.mp4" type="video/mp4" />
+    </video>
+
+    <!-- WebGL canvas will be injected here -->
+    <canvas id="projectCanvas"></canvas>
+    
+    <h1 class="project-heading">PROJECTS</h1>
+    <div class="projects">
       <div class="project-card">
-        <h3>Nebula Generator</h3>
-        <p>Interactive generative art installation that creates unique cosmic nebulas using particle systems and physics simulations.</p>
-        <a href="#" class="btn small">View Project</a>
+        <div class="card-image"></div> 
+        <div class="card-content">
+          <h2 style="font-family: 'Benzin-Semibold'; letter-spacing: 1px">Websites</h2>
+          <p>Showcasing UI/UX design and front-end work, turning ideas into clean, interactive, and visually engaging websites.</p>
+        </div>
       </div>
       <div class="project-card">
-        <h3>Digital Dreamscape</h3>
-        <p>VR experience that visualizes dream patterns using EEG data and creates immersive dream environments in real-time.</p>
-        <a href="#" class="btn small">View Project</a>
+        <div class="card-image"></div> 
+        <div class="card-content">
+          <h2 style="font-family: 'Benzin-Semibold'; letter-spacing: 1px">Music</h2>
+          <p>Original productions and sound design, crafting immersive tracks and atmospheres to complement visuals.</p>
+        </div>
       </div>
       <div class="project-card">
-        <h3>Quantum Interface</h3>
-        <p>Experimental UI framework that uses quantum computing principles to create adaptive, context-aware interfaces.</p>
-        <a href="#" class="btn small">View Project</a>
+        <div class="card-image"></div> 
+        <div class="card-content">
+          <h2 style="font-family: 'Benzin-Semibold'; letter-spacing: 1px">Artworks</h2>
+          <p>Digital art exploring storytelling, branding, and bold visuals through color, composition, and design.</p>
+        </div>
       </div>
       <div class="project-card">
-        <h3>Synthwave Dashboard</h3>
-        <p>Retro-futuristic analytics dashboard with neon aesthetics and real-time data visualization.</p>
-        <a href="#" class="btn small">View Project</a>
+        <div class="card-image"></div> 
+        <div class="card-content">
+          <h2 style="font-family: 'Benzin-Semibold'; letter-spacing: 1px">3D Art</h2>
+          <p>3D modeling and rendering projects, from futuristic concepts to detailed environments, blending realism and style.</p>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- <section id="services" class="services">
   <h2 class="section-title">Pricing</h2>
@@ -562,6 +577,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tsparticles-interaction-external-repulse/2.12.0/tsparticles.interaction.external.repulse.min.js"></script>
-  <script src="./js/script.js"></script>
+  <script type="module"src="./js/script.js"></script>
 </body>
 </html>
